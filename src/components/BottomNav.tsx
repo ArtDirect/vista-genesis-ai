@@ -4,8 +4,8 @@ import { useAppStore, type NavTab } from "@/lib/store";
 
 const tabs: { id: NavTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Home", icon: Home },
-  { id: "visualizations", label: "Visions", icon: Image },
   { id: "ritual", label: "Ritual", icon: Flame },
+  { id: "visualizations", label: "Scenes", icon: Image },
   { id: "profile", label: "Profile", icon: User },
 ];
 
@@ -14,17 +14,12 @@ const BottomNav = () => {
 
   const handleTab = (tab: NavTab) => {
     setActiveTab(tab);
-    if (tab === "home" && step !== "ritual") {
-      // Stay on current step
-    } else if (tab === "ritual") {
-      setStep("ritual");
-    } else if (tab === "home") {
-      setStep("ritual");
-    }
+    if (tab === "ritual") setStep("ritual");
+    else if (tab === "home") setStep("script");
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-md">
+    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
       <div className="border-t border-border/30 bg-background/90 backdrop-blur-xl">
         <div className="flex items-center justify-around px-2 py-2">
           {tabs.map((tab) => {
