@@ -55,7 +55,7 @@ const DreamCaptureScreen = () => {
         <h2 className="mb-3 text-3xl font-semibold text-foreground">
           Describe the life
           <br />
-          <span className="italic text-gradient-sunrise">you want to create</span>
+          <span className="italic text-gradient-sunrise">you want to live in 3 years</span>
         </h2>
         <p className="text-sm text-muted-foreground">
           Speak or type your vision for the future

@@ -5,9 +5,11 @@ import DreamCaptureScreen from "@/components/DreamCaptureScreen";
 import GeneratingScreen from "@/components/GeneratingScreen";
 import ScriptScreen from "@/components/ScriptScreen";
 import DailyRitualScreen from "@/components/DailyRitualScreen";
+import BottomNav from "@/components/BottomNav";
 
 const Index = () => {
   const step = useAppStore((s) => s.step);
+  const showNav = step === "script" || step === "ritual";
 
   return (
     <div className="mx-auto max-w-md">
@@ -18,6 +20,7 @@ const Index = () => {
         {step === "script" && <ScriptScreen key="script" />}
         {step === "ritual" && <DailyRitualScreen key="ritual" />}
       </AnimatePresence>
+      {showNav && <BottomNav />}
     </div>
   );
 };

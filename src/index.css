@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,58 +6,58 @@
 
 @layer base {
   :root {
-    --background: 230 25% 8%;
+    --background: 228 60% 11%;
     --foreground: 40 20% 92%;
 
-    --card: 230 20% 12%;
+    --card: 230 45% 14%;
     --card-foreground: 40 20% 92%;
 
-    --popover: 230 20% 12%;
+    --popover: 230 45% 14%;
     --popover-foreground: 40 20% 92%;
 
-    --primary: 12 70% 62%;
-    --primary-foreground: 230 25% 8%;
+    --primary: 0 100% 71%;
+    --primary-foreground: 228 60% 11%;
 
-    --secondary: 40 40% 70%;
-    --secondary-foreground: 230 25% 8%;
+    --secondary: 37 55% 73%;
+    --secondary-foreground: 228 60% 11%;
 
-    --muted: 230 15% 18%;
+    --muted: 230 30% 18%;
     --muted-foreground: 220 10% 55%;
 
     --accent: 175 40% 50%;
-    --accent-foreground: 230 25% 8%;
+    --accent-foreground: 228 60% 11%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 230 15% 20%;
-    --input: 230 15% 20%;
-    --ring: 12 70% 62%;
+    --border: 230 25% 20%;
+    --input: 230 25% 20%;
+    --ring: 0 100% 71%;
 
     --radius: 1rem;
 
-    --gold: 40 60% 65%;
-    --gold-foreground: 230 25% 8%;
-    --coral: 12 70% 62%;
+    --gold: 37 55% 73%;
+    --gold-foreground: 228 60% 11%;
+    --coral: 0 100% 71%;
     --turquoise: 175 40% 50%;
-    --indigo: 235 30% 18%;
-    --midnight: 230 25% 8%;
+    --indigo: 233 55% 13%;
+    --midnight: 228 60% 11%;
 
     --font-serif: 'Playfair Display', Georgia, serif;
-    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-sans: 'Inter', system-ui, sans-serif;
 
-    --gradient-sunrise: linear-gradient(135deg, hsl(12 70% 62%), hsl(40 60% 65%));
-    --gradient-ocean: linear-gradient(180deg, hsl(230 25% 8%), hsl(235 30% 18%));
-    --gradient-tropical: linear-gradient(135deg, hsl(175 40% 50% / 0.2), hsl(12 70% 62% / 0.2));
+    --gradient-sunrise: linear-gradient(135deg, hsl(0 100% 71%), hsl(37 55% 73%));
+    --gradient-ocean: linear-gradient(180deg, hsl(228 60% 11%), hsl(233 55% 13%));
+    --gradient-tropical: linear-gradient(135deg, hsl(175 40% 50% / 0.2), hsl(0 100% 71% / 0.2));
 
-    --sidebar-background: 230 20% 12%;
+    --sidebar-background: 230 45% 14%;
     --sidebar-foreground: 40 20% 92%;
-    --sidebar-primary: 12 70% 62%;
-    --sidebar-primary-foreground: 230 25% 8%;
-    --sidebar-accent: 230 15% 18%;
+    --sidebar-primary: 0 100% 71%;
+    --sidebar-primary-foreground: 228 60% 11%;
+    --sidebar-accent: 230 30% 18%;
     --sidebar-accent-foreground: 40 20% 92%;
-    --sidebar-border: 230 15% 20%;
-    --sidebar-ring: 12 70% 62%;
+    --sidebar-border: 230 25% 20%;
+    --sidebar-ring: 0 100% 71%;
   }
 }
 
@@ -101,9 +101,9 @@
     background-clip: text;
   }
   .glow-coral {
-    box-shadow: 0 0 40px hsl(12 70% 62% / 0.3);
+    box-shadow: 0 0 40px hsl(0 100% 71% / 0.3);
   }
   .glow-gold {
-    box-shadow: 0 0 40px hsl(40 60% 65% / 0.2);
+    box-shadow: 0 0 40px hsl(37 55% 73% / 0.2);
   }
 }
