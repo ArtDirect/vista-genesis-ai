@@ -4,6 +4,8 @@ import { useAppStore } from "@/lib/store";
 import AudioPlayer from "./AudioPlayer";
 import BackgroundSoundPicker from "./BackgroundSoundPicker";
 
+const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const };
+
 const DailyRitualScreen = () => {
   const { streak, setStep } = useAppStore();
 
@@ -12,28 +14,30 @@ const DailyRitualScreen = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[100dvh] gradient-ocean px-6 pb-24 pt-14"
+      transition={{ duration: 1 }}
+      className="min-h-[100dvh] gradient-twilight px-6 pb-24 pt-14"
     >
       <button
         onClick={() => setStep("script")}
-        className="mb-6 flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+        className="mb-8 flex items-center gap-1.5 text-xs text-muted-foreground/60 hover:text-foreground transition-colors duration-500"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to script
+        Back
       </button>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        transition={{ delay: 0.3, ...slow }}
+        className="mb-10"
       >
-        <p className="mb-1 text-xs font-medium tracking-[0.3em] uppercase text-gold">
-          ManifestFlow
+        <p className="mb-2 text-xs font-medium tracking-[0.4em] uppercase text-secondary/60">
+          Daily ritual
         </p>
-        <h1 className="mb-2 text-3xl font-semibold text-foreground">
-          Daily Listening
+        <h1 className="mb-2 text-3xl font-medium text-foreground">
+          Your daily
           <br />
-          <span className="italic text-gradient-sunrise">Ritual</span>
+          <span className="italic text-gradient-dawn">imagination practice</span>
         </h1>
       </motion.div>
 
@@ -41,17 +45,17 @@ const DailyRitualScreen = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mb-6 flex items-center gap-3 rounded-2xl border border-border/50 bg-card/80 p-4 backdrop-blur-sm"
+        transition={{ delay: 0.5, ...slow }}
+        className="mb-6 flex items-center gap-3 rounded-2xl border border-border/30 bg-card/40 p-4 backdrop-blur-sm"
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-full gradient-sunrise">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full gradient-dawn">
           <Flame className="h-6 w-6 text-primary-foreground" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground">
-            Day {streak} of your manifestation ritual
+          <p className="text-sm font-medium text-foreground">
+            Day {streak} of your practice
           </p>
-          <p className="text-xs text-muted-foreground">Keep listening daily</p>
+          <p className="text-xs text-muted-foreground/60">Every day, a little clearer</p>
         </div>
       </motion.div>
 
@@ -59,7 +63,7 @@ const DailyRitualScreen = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
+        transition={{ delay: 0.7, ...slow }}
         className="mb-6"
       >
         <BackgroundSoundPicker />
@@ -69,7 +73,7 @@ const DailyRitualScreen = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.9, ...slow }}
         className="mb-8"
       >
         <AudioPlayer />
@@ -79,28 +83,28 @@ const DailyRitualScreen = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 1.1, ...slow }}
         className="space-y-3"
       >
-        <button className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-card/80 px-5 py-4 text-left backdrop-blur-sm transition-colors hover:bg-muted/30">
-          <Headphones className="h-5 w-5 text-primary" />
+        <button className="flex w-full items-center gap-3 rounded-2xl border border-border/30 bg-card/40 px-5 py-4 text-left backdrop-blur-sm transition-all duration-500 hover:bg-card/60">
+          <Headphones className="h-5 w-5 text-primary/70" />
           <div>
-            <p className="text-sm font-medium text-foreground">Morning Affirmation</p>
-            <p className="text-xs text-muted-foreground">Listen to start your day</p>
+            <p className="text-sm font-medium text-foreground">Morning Visualization</p>
+            <p className="text-xs text-muted-foreground/60">Step into your future</p>
           </div>
         </button>
-        <button className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-card/80 px-5 py-4 text-left backdrop-blur-sm transition-colors hover:bg-muted/30">
-          <BookOpen className="h-5 w-5 text-gold" />
+        <button className="flex w-full items-center gap-3 rounded-2xl border border-border/30 bg-card/40 px-5 py-4 text-left backdrop-blur-sm transition-all duration-500 hover:bg-card/60">
+          <BookOpen className="h-5 w-5 text-gold/70" />
           <div>
             <p className="text-sm font-medium text-foreground">Read Your Script</p>
-            <p className="text-xs text-muted-foreground">Review your manifestation</p>
+            <p className="text-xs text-muted-foreground/60">Review your imagined future</p>
           </div>
         </button>
-        <button className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-card/80 px-5 py-4 text-left backdrop-blur-sm transition-colors hover:bg-muted/30">
-          <Library className="h-5 w-5 text-turquoise" />
+        <button className="flex w-full items-center gap-3 rounded-2xl border border-border/30 bg-card/40 px-5 py-4 text-left backdrop-blur-sm transition-all duration-500 hover:bg-card/60">
+          <Library className="h-5 w-5 text-accent/70" />
           <div>
-            <p className="text-sm font-medium text-foreground">My Manifestations</p>
-            <p className="text-xs text-muted-foreground">View saved manifestations</p>
+            <p className="text-sm font-medium text-foreground">Visualization Gallery</p>
+            <p className="text-xs text-muted-foreground/60">See all your scenes</p>
           </div>
         </button>
       </motion.div>

@@ -1,15 +1,15 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAppStore } from "@/lib/store";
-import vizWorkspace from "@/assets/viz-workspace.jpg";
-import vizSpeaking from "@/assets/viz-speaking.jpg";
+import vizFutureHome from "@/assets/viz-future-home.jpg";
+import vizHorizon from "@/assets/viz-horizon.jpg";
+import vizReflection from "@/assets/viz-reflection.jpg";
 import vizPeaceful from "@/assets/viz-peaceful.jpg";
-import vizGallery from "@/assets/viz-gallery.jpg";
 
 const steps = [
-  "Crafting your manifestation script...",
-  "Generating audio affirmation...",
-  "Preparing your listening experience...",
+  "Listening to your dream...",
+  "Shaping your visualization...",
+  "Preparing your experience...",
 ];
 
 const GeneratingScreen = () => {
@@ -18,16 +18,16 @@ const GeneratingScreen = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setManifestationScript(
-        "I am building a successful business that brings me complete financial freedom.\n\nOpportunities flow to me every day and my work creates massive value for the world.\n\nI am confident, focused, and aligned with abundance.\n\nMoney comes to me easily and I manage it wisely.\n\nEvery day I am becoming the best version of myself."
+        "I wake up in my beautiful home by the ocean, sunlight streaming through the windows.\n\nI feel deeply grateful for the life I've created — a life of creative freedom, abundance, and purpose.\n\nEvery day, I step into my work with clarity and confidence. Opportunities find me effortlessly.\n\nI am calm, focused, and aligned with the future I've designed.\n\nThis is my life. I see it clearly. I feel it completely."
       );
       setScenes([
-        { id: "1", src: vizWorkspace, title: "Abundance Mindset", favorited: false },
-        { id: "2", src: vizSpeaking, title: "Confident Expression", favorited: false },
-        { id: "3", src: vizPeaceful, title: "Inner Peace", favorited: false },
-        { id: "4", src: vizGallery, title: "Inspiration", favorited: false },
+        { id: "1", src: vizFutureHome, title: "Morning Light", favorited: false },
+        { id: "2", src: vizHorizon, title: "Infinite Horizon", favorited: false },
+        { id: "3", src: vizReflection, title: "Quiet Clarity", favorited: false },
+        { id: "4", src: vizPeaceful, title: "Inner Stillness", favorited: false },
       ]);
       setStep("script");
-    }, 4500);
+    }, 5000);
     return () => clearTimeout(timer);
   }, [setStep, setManifestationScript, setScenes]);
 
@@ -36,48 +36,50 @@ const GeneratingScreen = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex min-h-[100dvh] flex-col items-center justify-center gradient-ocean px-8"
+      transition={{ duration: 1 }}
+      className="flex min-h-[100dvh] flex-col items-center justify-center gradient-twilight px-8"
     >
+      {/* Ambient glow */}
       <motion.div
         animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.5, 1, 0.5],
+          scale: [1, 1.3, 1],
+          opacity: [0.2, 0.5, 0.2],
         }}
         transition={{
-          duration: 3,
+          duration: 5,
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="mb-12 h-32 w-32 rounded-full gradient-sunrise opacity-50 blur-xl"
+        className="mb-16 h-40 w-40 rounded-full gradient-dawn opacity-30 blur-3xl"
       />
 
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="mb-8 text-center text-2xl font-semibold text-foreground"
+        transition={{ delay: 0.5, duration: 1.5 }}
+        className="mb-10 text-center text-2xl font-medium text-foreground"
       >
-        Creating your
+        Your future is
         <br />
-        <span className="italic text-gradient-sunrise">manifestation</span>
+        <span className="italic text-gradient-dawn">emerging</span>
       </motion.h2>
 
-      <div className="w-full max-w-xs space-y-3">
+      <div className="w-full max-w-xs space-y-4">
         {steps.map((step, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1 + i * 1.2 }}
+            transition={{ delay: 1.5 + i * 1.3, duration: 1 }}
             className="flex items-center gap-3"
           >
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 1.3 + i * 1.2 }}
-              className="h-2 w-2 rounded-full gradient-sunrise"
+              transition={{ delay: 1.8 + i * 1.3, duration: 0.6 }}
+              className="h-1.5 w-1.5 rounded-full gradient-dawn"
             />
-            <p className="text-sm text-muted-foreground">{step}</p>
+            <p className="text-sm text-muted-foreground/70">{step}</p>
           </motion.div>
         ))}
       </div>
