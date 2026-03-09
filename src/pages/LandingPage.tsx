@@ -48,7 +48,7 @@ interface LandingPageProps {
   onStart: () => void;
 }
 
-const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] };
+const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const };
 const slowUp = { ...slow, delay: 0.3 };
 
 const LandingPage = ({ onStart }: LandingPageProps) => {

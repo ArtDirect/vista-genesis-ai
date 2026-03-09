@@ -10,7 +10,7 @@ const prompts = [
   "I feel deeply connected to the people I love.",
 ];
 
-const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] };
+const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const };
 
 const DreamCaptureScreen = () => {
   const { setStep, setDreamText, dreamText } = useAppStore();

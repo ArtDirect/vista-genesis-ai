@@ -4,7 +4,7 @@ import { useAppStore } from "@/lib/store";
 import AudioPlayer from "./AudioPlayer";
 import BackgroundSoundPicker from "./BackgroundSoundPicker";
 
-const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] };
+const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const };
 
 const DailyRitualScreen = () => {
   const { streak, setStep } = useAppStore();

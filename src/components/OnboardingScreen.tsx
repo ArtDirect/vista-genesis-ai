@@ -13,7 +13,7 @@ const categories = [
   { id: "custom", label: "Custom", icon: PenLine },
 ];
 
-const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] };
+const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const };
 
 const OnboardingScreen = () => {
   const { setStep, setDreamCategory } = useAppStore();
