@@ -24,7 +24,7 @@ const BottomNav = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-md">
+    <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
       <div className="border-t border-border/30 bg-background/90 backdrop-blur-xl">
         <div className="flex items-center justify-around px-2 py-2">
           {tabs.map((tab) => {

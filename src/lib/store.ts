@@ -8,7 +8,7 @@ export interface VisualizationScene {
 }
 
 export type AppStep = 'onboarding' | 'dream-capture' | 'generating' | 'script' | 'ritual';
-export type NavTab = 'home' | 'visualizations' | 'ritual' | 'profile';
+export type NavTab = 'home' | 'visualizations' | 'ritual' | 'progress' | 'profile';
 
 interface AppState {
   step: AppStep;
