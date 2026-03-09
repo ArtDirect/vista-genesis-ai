@@ -39,7 +39,7 @@ const DailyRitualScreen = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-[100dvh] gradient-ocean px-6 pb-8 pt-14"
+      className="min-h-[100dvh] gradient-ocean px-6 pb-24 pt-14"
     >
       {/* Back */}
       <button
