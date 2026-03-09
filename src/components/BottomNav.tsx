@@ -4,8 +4,8 @@ import { useAppStore, type NavTab } from "@/lib/store";
 
 const tabs: { id: NavTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Home", icon: Home },
-  { id: "visualizations", label: "Visions", icon: Image },
   { id: "ritual", label: "Ritual", icon: Flame },
+  { id: "visualizations", label: "Scenes", icon: Image },
   { id: "profile", label: "Profile", icon: User },
 ];
 
