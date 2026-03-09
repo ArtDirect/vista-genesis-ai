@@ -1,11 +1,10 @@
-import { Home, Image, Flame, BarChart3, User } from "lucide-react";
+import { Home, Library, Plus, User } from "lucide-react";
 import { useAppStore, type NavTab } from "@/lib/store";
 
 const navItems: { id: NavTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Home", icon: Home },
-  { id: "visualizations", label: "Visualizations", icon: Image },
-  { id: "ritual", label: "Daily Ritual", icon: Flame },
-  { id: "progress", label: "Progress", icon: BarChart3 },
+  { id: "visualizations", label: "My Manifestations", icon: Library },
+  { id: "ritual", label: "Create", icon: Plus },
   { id: "profile", label: "Profile", icon: User },
 ];
 
@@ -22,7 +21,7 @@ const AppSidebar = () => {
     <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-border/30 bg-card/40 backdrop-blur-sm">
       <div className="px-6 py-8">
         <span className="text-xl font-semibold font-serif text-gradient-sunrise">
-          FutureSelf
+          ManifestFlow
         </span>
       </div>
 
@@ -51,7 +50,7 @@ const AppSidebar = () => {
 
       <div className="border-t border-border/20 p-4">
         <p className="text-[10px] text-muted-foreground/50 text-center">
-          Experience your future before it happens
+          Speak your dreams. Listen to your future.
         </p>
       </div>
     </aside>

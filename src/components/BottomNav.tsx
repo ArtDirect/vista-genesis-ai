@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
-import { Home, Image, Flame, User } from "lucide-react";
+import { Home, Library, Flame, User } from "lucide-react";
 import { useAppStore, type NavTab } from "@/lib/store";
 
 const tabs: { id: NavTab; label: string; icon: typeof Home }[] = [
   { id: "home", label: "Home", icon: Home },
   { id: "ritual", label: "Ritual", icon: Flame },
-  { id: "visualizations", label: "Scenes", icon: Image },
+  { id: "visualizations", label: "Library", icon: Library },
   { id: "profile", label: "Profile", icon: User },
 ];
 
 const BottomNav = () => {
-  const { activeTab, setActiveTab, step, setStep } = useAppStore();
+  const { activeTab, setActiveTab, setStep } = useAppStore();
 
   const handleTab = (tab: NavTab) => {
     setActiveTab(tab);
@@ -53,7 +53,6 @@ const BottomNav = () => {
             );
           })}
         </div>
-        {/* Safe area for notched phones */}
         <div className="h-[env(safe-area-inset-bottom)]" />
       </div>
     </div>

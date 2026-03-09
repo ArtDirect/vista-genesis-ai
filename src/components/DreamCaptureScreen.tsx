@@ -4,10 +4,10 @@ import { Mic, MicOff, ArrowRight, Keyboard } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 
 const placeholders = [
-  "I run a successful company.",
-  "I live near the ocean.",
-  "I feel confident speaking in public.",
-  "I wake up every day excited about my work.",
+  "I want financial freedom and a successful business.",
+  "I want to be healthy, strong, and full of energy.",
+  "I want to travel the world and live on my own terms.",
+  "I want deep, loving relationships in my life.",
 ];
 
 const DreamCaptureScreen = () => {
@@ -20,8 +20,7 @@ const DreamCaptureScreen = () => {
   const toggleRecording = () => {
     if (isRecording) {
       setIsRecording(false);
-      // Mock transcription
-      const mock = "I want to build a successful business that gives me freedom to travel the world. I wake up every morning excited and energized. I live in a beautiful home near the ocean.";
+      const mock = "I want financial freedom and a successful business that lets me travel the world. I want to wake up every morning feeling abundant and grateful.";
       setLocalText(mock);
     } else {
       setIsRecording(true);
@@ -42,7 +41,6 @@ const DreamCaptureScreen = () => {
       transition={{ duration: 0.8 }}
       className="flex min-h-[100dvh] flex-col gradient-ocean px-6 pt-16 pb-8"
     >
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,19 +48,18 @@ const DreamCaptureScreen = () => {
         className="mb-8 text-center"
       >
         <p className="mb-2 text-xs font-medium tracking-[0.3em] uppercase text-gold">
-          Dream Capture
+          Manifestation Capture
         </p>
         <h2 className="mb-3 text-3xl font-semibold text-foreground">
-          Describe the life
+          What do you want to
           <br />
-          <span className="italic text-gradient-sunrise">you want to live in 3 years</span>
+          <span className="italic text-gradient-sunrise">manifest in your life?</span>
         </h2>
         <p className="text-sm text-muted-foreground">
-          Speak or type your vision for the future
+          Speak or type your desire
         </p>
       </motion.div>
 
-      {/* Placeholder prompts */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -82,7 +79,6 @@ const DreamCaptureScreen = () => {
 
       <div className="flex-1" />
 
-      {/* Text input area */}
       {showText && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -93,14 +89,13 @@ const DreamCaptureScreen = () => {
             ref={textareaRef}
             value={localText}
             onChange={(e) => setLocalText(e.target.value)}
-            placeholder="Describe the life you want to create..."
+            placeholder="Describe what you want to manifest..."
             rows={4}
             className="w-full resize-none rounded-xl border border-border bg-card/80 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50"
           />
         </motion.div>
       )}
 
-      {/* Controls */}
       <div className="flex items-center justify-center gap-4">
         {!showText && (
           <button
@@ -141,7 +136,7 @@ const DreamCaptureScreen = () => {
       </div>
 
       <p className="mt-4 text-center text-xs text-muted-foreground/50">
-        {isRecording ? "Recording... tap to stop" : "Tap the mic to record your dream"}
+        {isRecording ? "Recording... tap to stop" : "Tap the mic to speak your desire"}
       </p>
     </motion.div>
   );

@@ -8,8 +8,8 @@ import vizGallery from "@/assets/viz-gallery.jpg";
 
 const steps = [
   "Crafting your manifestation script...",
-  "Generating affirmation audio...",
-  "Creating visualization scenes...",
+  "Generating audio affirmation...",
+  "Preparing your listening experience...",
 ];
 
 const GeneratingScreen = () => {
@@ -18,13 +18,13 @@ const GeneratingScreen = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setManifestationScript(
-        "You wake up calm and energized.\nThe morning light warms your face as you step into your workspace overlooking the ocean.\n\nYour work feels meaningful.\nYour ideas are turning into successful projects that impact thousands of lives.\n\nYou speak with confidence and clarity.\nPeople are drawn to your vision and your presence commands respect.\n\nYou live with freedom and purpose.\nEvery day feels like a step closer to the extraordinary life you've designed."
+        "I am building a successful business that brings me complete financial freedom.\n\nOpportunities flow to me every day and my work creates massive value for the world.\n\nI am confident, focused, and aligned with abundance.\n\nMoney comes to me easily and I manage it wisely.\n\nEvery day I am becoming the best version of myself."
       );
       setScenes([
-        { id: "1", src: vizWorkspace, title: "Your Dream Workspace", favorited: false },
-        { id: "2", src: vizSpeaking, title: "Confident Speaking", favorited: false },
-        { id: "3", src: vizPeaceful, title: "Peaceful Living", favorited: false },
-        { id: "4", src: vizGallery, title: "Inspiration Gallery", favorited: false },
+        { id: "1", src: vizWorkspace, title: "Abundance Mindset", favorited: false },
+        { id: "2", src: vizSpeaking, title: "Confident Expression", favorited: false },
+        { id: "3", src: vizPeaceful, title: "Inner Peace", favorited: false },
+        { id: "4", src: vizGallery, title: "Inspiration", favorited: false },
       ]);
       setStep("script");
     }, 4500);
@@ -38,7 +38,6 @@ const GeneratingScreen = () => {
       exit={{ opacity: 0 }}
       className="flex min-h-[100dvh] flex-col items-center justify-center gradient-ocean px-8"
     >
-      {/* Glowing orb */}
       <motion.div
         animate={{
           scale: [1, 1.2, 1],
@@ -58,9 +57,9 @@ const GeneratingScreen = () => {
         transition={{ delay: 0.5 }}
         className="mb-8 text-center text-2xl font-semibold text-foreground"
       >
-        Designing your future
+        Creating your
         <br />
-        <span className="italic text-gradient-sunrise">visualization</span>
+        <span className="italic text-gradient-sunrise">manifestation</span>
       </motion.h2>
 
       <div className="w-full max-w-xs space-y-3">

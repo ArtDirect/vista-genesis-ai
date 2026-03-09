@@ -18,6 +18,7 @@ interface AppState {
   manifestationScript: string;
   scenes: VisualizationScene[];
   streak: number;
+  backgroundSound: string;
   setStep: (step: AppStep) => void;
   setActiveTab: (tab: NavTab) => void;
   setDreamText: (text: string) => void;
@@ -25,6 +26,7 @@ interface AppState {
   setManifestationScript: (script: string) => void;
   setScenes: (scenes: VisualizationScene[]) => void;
   toggleFavorite: (id: string) => void;
+  setBackgroundSound: (sound: string) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -35,6 +37,7 @@ export const useAppStore = create<AppState>((set) => ({
   manifestationScript: '',
   scenes: [],
   streak: 4,
+  backgroundSound: 'ocean',
   setStep: (step) => set({ step }),
   setActiveTab: (tab) => set({ activeTab: tab }),
   setDreamText: (dreamText) => set({ dreamText }),
@@ -47,4 +50,5 @@ export const useAppStore = create<AppState>((set) => ({
         s.id === id ? { ...s, favorited: !s.favorited } : s
       ),
     })),
+  setBackgroundSound: (backgroundSound) => set({ backgroundSound }),
 }));
