@@ -14,13 +14,8 @@ const BottomNav = () => {
 
   const handleTab = (tab: NavTab) => {
     setActiveTab(tab);
-    if (tab === "home" && step !== "ritual") {
-      // Stay on current step
-    } else if (tab === "ritual") {
-      setStep("ritual");
-    } else if (tab === "home") {
-      setStep("ritual");
-    }
+    if (tab === "ritual") setStep("ritual");
+    else if (tab === "home") setStep("script");
   };
 
   return (
