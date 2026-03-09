@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Eye, Headphones, Flame, Star } from "lucide-react";
+import { ArrowRight, Sparkles, Mic, Headphones, Flame, Star, Music } from "lucide-react";
 import heroImage from "@/assets/hero-sunrise.jpg";
 import vizWorkspace from "@/assets/viz-workspace.jpg";
 import vizPeaceful from "@/assets/viz-peaceful.jpg";
@@ -7,47 +7,47 @@ import vizSpeaking from "@/assets/viz-speaking.jpg";
 
 const steps = [
   {
-    icon: Sparkles,
-    title: "Speak Your Dreams",
-    desc: "Describe the life you want to create using voice or text.",
+    icon: Mic,
+    title: "Speak Your Desire",
+    desc: "Record or type what you want to manifest in your life.",
   },
   {
-    icon: Eye,
-    title: "AI Generates Your Vision",
-    desc: "We craft personalized scripts, audio, and cinematic scenes.",
+    icon: Sparkles,
+    title: "AI Creates Your Script",
+    desc: "AI restructures your words into a powerful manifestation statement.",
+  },
+  {
+    icon: Music,
+    title: "Choose Your Sound",
+    desc: "Pick calming background sounds — ocean waves, soft piano, or forest.",
   },
   {
     icon: Headphones,
-    title: "Experience Daily",
-    desc: "Replay your immersive visualization ritual every morning.",
-  },
-  {
-    icon: Flame,
-    title: "Transform Your Life",
-    desc: "Build belief, clarity, and momentum toward your future self.",
+    title: "Listen Daily",
+    desc: "Play your personalized audio affirmation every day to manifest.",
   },
 ];
 
 const benefits = [
-  "Stronger belief in your goals",
-  "Emotional connection to your future",
-  "Daily motivation & consistency",
-  "A clear vision of your future identity",
+  "Correctly phrased affirmations powered by AI",
+  "Personalized audio you can listen to daily",
+  "Calming background sounds for deep focus",
+  "Build a consistent manifestation ritual",
 ];
 
 const testimonials = [
   {
-    quote: "FutureSelf changed the way I think about my goals. It's like meditating on my dream life every morning.",
+    quote: "ManifestFlow turned my vague goals into powerful affirmations I actually listen to every day.",
     name: "Sarah M.",
     role: "Entrepreneur",
   },
   {
-    quote: "The visualization scenes feel so real. I've never been this emotionally connected to my future.",
+    quote: "The background sounds make it feel like a meditation. I've never been this consistent with manifestation.",
     name: "James K.",
     role: "Creative Director",
   },
   {
-    quote: "I replaced my morning scroll with FutureSelf. My focus and clarity have never been higher.",
+    quote: "I just speak what I want, and AI creates the perfect script. It's like having a manifestation coach.",
     name: "Priya L.",
     role: "Wellness Coach",
   },
@@ -64,7 +64,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/20">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <span className="text-lg font-semibold tracking-wide font-serif text-gradient-sunrise">
-            FutureSelf
+            ManifestFlow
           </span>
           <motion.button
             whileHover={{ scale: 1.03 }}
@@ -80,7 +80,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
       {/* Hero */}
       <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden pt-16">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Ocean sunrise" className="h-full w-full object-cover" />
+          <img src={heroImage} alt="Calm sunrise" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/40" />
           <div className="absolute inset-0 bg-gradient-to-r from-background/60 to-transparent" />
         </div>
@@ -93,7 +93,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               transition={{ delay: 0.3 }}
               className="mb-4 text-sm font-medium tracking-[0.3em] uppercase text-secondary"
             >
-              AI-Powered Visualization
+              AI-Powered Manifestation
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
@@ -101,9 +101,9 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               transition={{ delay: 0.5, duration: 0.8 }}
               className="mb-6 text-4xl font-semibold leading-tight tracking-tight md:text-6xl lg:text-7xl"
             >
-              Experience Your Future
+              Speak Your Dreams.
               <br />
-              <span className="italic text-gradient-sunrise">Before It Happens</span>
+              <span className="italic text-gradient-sunrise">Listen To Your Future.</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -111,7 +111,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               transition={{ delay: 0.7 }}
               className="mb-10 max-w-lg text-lg leading-relaxed text-muted-foreground md:text-xl"
             >
-              Speak your dreams and turn them into immersive daily visualizations powered by AI.
+              Turn your desires into powerful manifestation audio you can listen to every day.
             </motion.p>
             <motion.button
               initial={{ opacity: 0, y: 20 }}
@@ -122,7 +122,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               onClick={onStart}
               className="group flex items-center gap-3 rounded-2xl gradient-sunrise px-8 py-4 text-lg font-semibold text-primary-foreground shadow-lg glow-coral"
             >
-              Start Creating Your Future
+              Create My Manifestation
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </motion.button>
           </div>
@@ -142,7 +142,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               How It Works
             </p>
             <h2 className="text-3xl font-semibold md:text-4xl">
-              Four steps to your <span className="italic text-gradient-sunrise">future self</span>
+              Three steps to your <span className="italic text-gradient-sunrise">manifestation</span>
             </h2>
           </motion.div>
 
@@ -167,7 +167,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
         </div>
       </section>
 
-      {/* Example Visualization */}
+      {/* Example Experience */}
       <section className="py-24 md:py-32 gradient-ocean">
         <div className="mx-auto max-w-6xl px-6">
           <motion.div
@@ -180,15 +180,40 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               Example Experience
             </p>
             <h2 className="text-3xl font-semibold md:text-4xl">
-              What your <span className="italic text-gradient-sunrise">visualization</span> looks like
+              What your <span className="italic text-gradient-sunrise">manifestation</span> sounds like
             </h2>
           </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-3">
+          {/* Script preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mx-auto max-w-2xl rounded-2xl border border-border/50 bg-card/60 p-8 backdrop-blur-sm"
+          >
+            <Sparkles className="mb-4 h-5 w-5 text-gold" />
+            <p className="font-serif italic text-lg leading-relaxed text-foreground/80">
+              "I am building a successful business that brings me financial freedom.
+              Opportunities flow to me every day and my work creates value for the world.
+              I am confident, focused, and aligned with abundance."
+            </p>
+            <div className="mt-6 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full gradient-sunrise">
+                <Headphones className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">With ocean waves background</p>
+                <p className="text-xs text-muted-foreground">Listen daily for best results</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Scene imagery */}
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {[
-              { src: vizWorkspace, title: "Your Dream Workspace" },
-              { src: vizSpeaking, title: "Confident Speaking" },
-              { src: vizPeaceful, title: "Peaceful Living" },
+              { src: vizWorkspace, title: "Abundance Mindset" },
+              { src: vizSpeaking, title: "Confident Expression" },
+              { src: vizPeaceful, title: "Inner Peace" },
             ].map((scene, i) => (
               <motion.div
                 key={scene.title}
@@ -210,21 +235,6 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               </motion.div>
             ))}
           </div>
-
-          {/* Script preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mx-auto mt-12 max-w-2xl rounded-2xl border border-border/50 bg-card/60 p-8 backdrop-blur-sm"
-          >
-            <Sparkles className="mb-4 h-5 w-5 text-gold" />
-            <p className="font-serif italic text-lg leading-relaxed text-foreground/80">
-              "You wake up calm and energized. The morning light warms your face as you step into your
-              workspace overlooking the ocean. Your work feels meaningful. Your ideas are turning into
-              successful projects that impact thousands of lives."
-            </p>
-          </motion.div>
         </div>
       </section>
 
@@ -241,8 +251,8 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
                 Benefits
               </p>
               <h2 className="mb-8 text-3xl font-semibold md:text-4xl">
-                Why daily visualization{" "}
-                <span className="italic text-gradient-sunrise">transforms lives</span>
+                Why ManifestFlow{" "}
+                <span className="italic text-gradient-sunrise">works</span>
               </h2>
               <ul className="space-y-4">
                 {benefits.map((b, i) => (
@@ -271,7 +281,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
             >
               <img
                 src={vizPeaceful}
-                alt="Peaceful visualization"
+                alt="Peaceful manifestation"
                 className="rounded-2xl object-cover w-full aspect-square"
               />
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-background/40 to-transparent" />
@@ -329,10 +339,10 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
             viewport={{ once: true }}
           >
             <h2 className="mb-4 text-3xl font-semibold md:text-5xl">
-              Your future is <span className="italic text-gradient-sunrise">waiting</span>
+              Your manifestation is <span className="italic text-gradient-sunrise">waiting</span>
             </h2>
             <p className="mb-10 text-lg text-muted-foreground">
-              Step into the life you're creating. Start your daily visualization ritual today.
+              Speak your dreams. Listen to your future. Start your daily ritual today.
             </p>
             <motion.button
               whileHover={{ scale: 1.03 }}
@@ -340,7 +350,7 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
               onClick={onStart}
               className="group mx-auto flex items-center gap-3 rounded-2xl gradient-sunrise px-10 py-5 text-lg font-semibold text-primary-foreground shadow-lg glow-coral"
             >
-              Start Creating Your Future
+              Create My Manifestation
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </motion.button>
           </motion.div>
@@ -350,9 +360,9 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
       {/* Footer */}
       <footer className="border-t border-border/20 py-8">
         <div className="mx-auto max-w-6xl px-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
-          <span className="text-sm font-semibold font-serif text-gradient-sunrise">FutureSelf</span>
+          <span className="text-sm font-semibold font-serif text-gradient-sunrise">ManifestFlow</span>
           <p className="text-xs text-muted-foreground">
-            © 2026 FutureSelf. Experience your future before it happens.
+            © 2026 ManifestFlow. Speak your dreams. Listen to your future.
           </p>
         </div>
       </footer>

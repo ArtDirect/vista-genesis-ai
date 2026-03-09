@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Play, Pause, Volume2 } from "lucide-react";
+import { useAppStore } from "@/lib/store";
+
+const soundLabels: Record<string, string> = {
+  ocean: "Ocean Waves",
+  ambient: "Meditation",
+  piano: "Soft Piano",
+  forest: "Forest Sounds",
+  focus: "Deep Focus",
+};
 
 const AudioPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const { backgroundSound } = useAppStore();
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
     if (!isPlaying) {
-      // Mock progress
       const interval = setInterval(() => {
         setProgress((p) => {
           if (p >= 100) {
@@ -28,7 +37,7 @@ const AudioPlayer = () => {
       <div className="mb-3 flex items-center gap-3">
         <Volume2 className="h-4 w-4 text-gold" />
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-gold">
-          Morning Affirmation
+          Manifestation Audio · {soundLabels[backgroundSound] || "Ocean Waves"}
         </p>
       </div>
 
@@ -46,7 +55,6 @@ const AudioPlayer = () => {
         </motion.button>
 
         <div className="flex-1">
-          {/* Progress bar */}
           <div className="mb-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <motion.div
               className="h-full rounded-full gradient-sunrise"

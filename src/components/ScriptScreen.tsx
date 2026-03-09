@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Heart, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import VisualizationGallery from "./VisualizationGallery";
 import AudioPlayer from "./AudioPlayer";
+import BackgroundSoundPicker from "./BackgroundSoundPicker";
 
 const ScriptScreen = () => {
-  const { manifestationScript, setManifestationScript, setStep, scenes, toggleFavorite } = useAppStore();
+  const { manifestationScript, setManifestationScript, setStep } = useAppStore();
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(manifestationScript);
 
@@ -22,7 +22,6 @@ const ScriptScreen = () => {
       exit={{ opacity: 0 }}
       className="min-h-[100dvh] gradient-ocean px-6 pb-24 pt-14"
     >
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -32,7 +31,7 @@ const ScriptScreen = () => {
           Your Manifestation
         </p>
         <h2 className="text-2xl font-semibold text-foreground">
-          <span className="italic text-gradient-sunrise">Your Future Script</span>
+          <span className="italic text-gradient-sunrise">Your Manifestation Script</span>
         </h2>
       </motion.div>
 
@@ -41,7 +40,7 @@ const ScriptScreen = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="relative mb-8 rounded-2xl border border-border/50 bg-card/80 p-6 backdrop-blur-sm"
+        className="relative mb-6 rounded-2xl border border-border/50 bg-card/80 p-6 backdrop-blur-sm"
       >
         <Sparkles className="absolute right-4 top-4 h-4 w-4 text-gold" />
 
@@ -73,37 +72,42 @@ const ScriptScreen = () => {
             <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90 font-serif italic">
               {manifestationScript}
             </p>
-            <button
-              onClick={() => setIsEditing(true)}
-              className="mt-4 text-xs text-primary hover:underline"
-            >
-              Edit script
-            </button>
+            <div className="mt-4 flex gap-3">
+              <button
+                onClick={() => setIsEditing(true)}
+                className="text-xs text-primary hover:underline"
+              >
+                Edit script
+              </button>
+              <button
+                onClick={() => {}}
+                className="text-xs text-muted-foreground hover:underline"
+              >
+                Regenerate
+              </button>
+            </div>
           </>
         )}
+      </motion.div>
+
+      {/* Background Sound Picker */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="mb-6"
+      >
+        <BackgroundSoundPicker />
       </motion.div>
 
       {/* Audio Player */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="mb-8"
-      >
-        <AudioPlayer />
-      </motion.div>
-
-      {/* Visualization Gallery */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
         className="mb-8"
       >
-        <h3 className="mb-4 text-lg font-semibold text-foreground">
-          Your Vision Board
-        </h3>
-        <VisualizationGallery scenes={scenes} onToggleFavorite={toggleFavorite} />
+        <AudioPlayer />
       </motion.div>
 
       {/* CTA */}
@@ -116,7 +120,7 @@ const ScriptScreen = () => {
         onClick={() => setStep("ritual")}
         className="flex w-full items-center justify-center gap-2 rounded-2xl gradient-sunrise px-8 py-4 text-base font-semibold text-primary-foreground glow-coral"
       >
-        Begin Daily Ritual
+        Start Listening
         <ArrowRight className="h-4 w-4" />
       </motion.button>
     </motion.div>

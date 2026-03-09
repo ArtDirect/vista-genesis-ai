@@ -33,13 +33,8 @@ const OnboardingScreen = () => {
       transition={{ duration: 1.2 }}
       className="relative flex min-h-[100dvh] flex-col items-center justify-end overflow-hidden"
     >
-      {/* Background image */}
       <div className="absolute inset-0">
-        <img
-          src={heroImage}
-          alt="Ocean sunrise"
-          className="h-full w-full object-cover"
-        />
+        <img src={heroImage} alt="Calm sunrise" className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
       </div>
 
@@ -59,17 +54,17 @@ const OnboardingScreen = () => {
               transition={{ delay: 0.6, duration: 0.8 }}
               className="mb-3 text-sm font-medium tracking-[0.3em] uppercase text-secondary"
             >
-              FutureSelf
+              ManifestFlow
             </motion.p>
 
             <h1 className="mb-4 text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
-              Design Your
+              Speak Your Dreams.
               <br />
-              <span className="text-gradient-sunrise italic">Future Life</span>
+              <span className="text-gradient-sunrise italic">Listen To Your Future.</span>
             </h1>
 
             <p className="mb-10 max-w-xs text-base leading-relaxed text-muted-foreground">
-              Speak your dreams and experience them daily.
+              Turn your desires into powerful manifestation audio you can listen to every day.
             </p>
 
             <motion.button
@@ -78,11 +73,11 @@ const OnboardingScreen = () => {
               onClick={() => setSubStep("category")}
               className="w-full max-w-xs rounded-2xl gradient-sunrise px-8 py-4 text-base font-semibold text-primary-foreground shadow-lg glow-coral transition-all animate-breathe"
             >
-              Start My Future
+              Create My Manifestation
             </motion.button>
 
             <p className="mt-6 text-xs text-muted-foreground/60">
-              Experience your future before it happens
+              Speak your dreams. Listen to your future.
             </p>
           </motion.div>
         )}
@@ -100,12 +95,12 @@ const OnboardingScreen = () => {
               Step 1 of 2
             </p>
             <h2 className="mb-2 text-2xl font-semibold text-foreground">
-              What kind of future
+              What do you want
               <br />
-              <span className="italic text-gradient-sunrise">are you creating?</span>
+              <span className="italic text-gradient-sunrise">to manifest?</span>
             </h2>
             <p className="mb-8 text-sm text-muted-foreground">
-              Choose a focus for your visualization
+              Choose a focus for your manifestation
             </p>
 
             <div className="grid w-full max-w-xs grid-cols-2 gap-3 mb-8">
