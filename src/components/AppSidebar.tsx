@@ -1,58 +1,49 @@
-import { Home, Library, Plus, User } from "lucide-react";
-import { useAppStore, type NavTab } from "@/lib/store";
+import { Home, Images, Flame, User, Plus } from "lucide-react";
+import { useAppStore, type NavTab, type AppStep } from "@/lib/store";
 
-const navItems: { id: NavTab; label: string; icon: typeof Home }[] = [
-  { id: "home", label: "Home", icon: Home },
-  { id: "visualizations", label: "Visualizations", icon: Library },
-  { id: "ritual", label: "Create", icon: Plus },
-  { id: "profile", label: "Profile", icon: User },
+const items: { id: NavTab; label: string; icon: typeof Home; step: AppStep }[] = [
+  { id: "home", label: "Home", icon: Home, step: "dashboard" },
+  { id: "visualizations", label: "My Scenes", icon: Images, step: "gallery" },
+  { id: "ritual", label: "Daily Ritual", icon: Flame, step: "dashboard" },
+  { id: "profile", label: "Profile", icon: User, step: "dashboard" },
 ];
 
 const AppSidebar = () => {
   const { activeTab, setActiveTab, setStep } = useAppStore();
 
-  const handleNav = (tab: NavTab) => {
-    setActiveTab(tab);
-    if (tab === "ritual") setStep("ritual");
-    if (tab === "home") setStep("script");
+  const handleNav = (item: typeof items[0]) => {
+    setActiveTab(item.id);
+    setStep(item.step);
   };
 
   return (
-    <aside className="hidden lg:flex w-64 shrink-0 flex-col border-r border-border/15 bg-card/20 backdrop-blur-sm">
-      <div className="px-6 py-8">
-        <span className="text-lg font-medium font-serif text-gradient-dawn">
-          ManifestFlow
-        </span>
-      </div>
+    <aside className="hidden lg:flex w-60 flex-col border-r border-border bg-card p-6">
+      <h1 className="mb-8 text-lg font-serif text-foreground">ManifestFlow</h1>
 
-      <nav className="flex-1 px-3 space-y-1">
-        {navItems.map((item) => {
+      <nav className="space-y-1 flex-1">
+        {items.map((item) => {
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
-              onClick={() => handleNav(item.id)}
-              className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-500 ${
-                isActive
-                  ? "bg-primary/8 text-primary"
-                  : "text-muted-foreground hover:bg-muted/20 hover:text-foreground"
+              onClick={() => handleNav(item)}
+              className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
+                isActive ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:text-foreground hover:bg-muted"
               }`}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className="h-4 w-4" />
               {item.label}
-              {isActive && (
-                <div className="ml-auto h-1.5 w-1.5 rounded-full gradient-dawn" />
-              )}
             </button>
           );
         })}
       </nav>
 
-      <div className="border-t border-border/10 p-4">
-        <p className="text-[10px] text-muted-foreground/30 text-center">
-          A quiet studio for designing your future.
-        </p>
-      </div>
+      <button
+        onClick={() => { useAppStore.getState().resetApp(); }}
+        className="mt-auto flex items-center gap-2 rounded-lg px-3 py-2.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <Plus className="h-3.5 w-3.5" /> New Visualization
+      </button>
     </aside>
   );
 };
