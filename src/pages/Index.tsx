@@ -6,6 +6,8 @@ import OnboardingScreen from "@/components/OnboardingScreen";
 import DreamCaptureScreen from "@/components/DreamCaptureScreen";
 import GeneratingScreen from "@/components/GeneratingScreen";
 import ScriptScreen from "@/components/ScriptScreen";
+import AffirmationAudioScreen from "@/components/AffirmationAudioScreen";
+import GalleryScreen from "@/components/GalleryScreen";
 import DailyRitualScreen from "@/components/DailyRitualScreen";
 import AppLayout from "@/components/AppLayout";
 
@@ -14,7 +16,7 @@ const Index = () => {
   const setStep = useAppStore((s) => s.setStep);
   const [showLanding, setShowLanding] = useState(true);
 
-  const showNav = step === "script" || step === "ritual";
+  const showNav = step === "dashboard" || step === "gallery";
 
   if (showLanding && step === "onboarding") {
     return (
@@ -34,7 +36,9 @@ const Index = () => {
         {step === "dream-capture" && <DreamCaptureScreen key="dream-capture" />}
         {step === "generating" && <GeneratingScreen key="generating" />}
         {step === "script" && <ScriptScreen key="script" />}
-        {step === "ritual" && <DailyRitualScreen key="ritual" />}
+        {step === "audio" && <AffirmationAudioScreen key="audio" />}
+        {step === "gallery" && <GalleryScreen key="gallery" />}
+        {step === "dashboard" && <DailyRitualScreen key="dashboard" />}
       </AnimatePresence>
     </AppLayout>
   );
