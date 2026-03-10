@@ -1,61 +1,84 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Mic, Sparkles, Headphones } from "lucide-react";
+import { trackEvent } from "@/lib/events";
 
 const steps = [
-  { icon: Mic, title: "Speak your dream", desc: "Describe the future life you want to create, in your own words." },
-  { icon: Sparkles, title: "AI builds your ritual", desc: "We turn your words into a manifestation script, visuals, and audio." },
-  { icon: Headphones, title: "Listen every day", desc: "A simple morning, midday, and night ritual to stay connected to your goals." },
+  { icon: Mic, num: "1", title: "Record your manifestation", desc: "Messy is fine. Just speak from the heart." },
+  { icon: Sparkles, num: "2", title: "We perfect your script", desc: "Clear, powerful, in your voice." },
+  { icon: Headphones, num: "3", title: "Get your audio", desc: "A daily track you'll actually replay." },
 ];
 
-interface LandingPageProps {
-  onStart: () => void;
-}
+const LandingPage = () => {
+  const navigate = useNavigate();
 
-const LandingPage = ({ onStart }: LandingPageProps) => {
+  useEffect(() => {
+    trackEvent("page_view", "/");
+  }, []);
+
+  const handleCTA = () => {
+    trackEvent("cta_clicked", "/");
+    navigate("/create");
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Hero */}
       <section className="flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center">
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 1 }}
-          className="mb-4 text-sm font-medium text-muted-foreground tracking-wide"
-        >
-          ManifestFlow
-        </motion.p>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.8 }}
-          className="mb-6 max-w-lg text-4xl font-serif leading-tight md:text-5xl"
+          transition={{ delay: 0.2, duration: 0.7 }}
+          className="mb-6 max-w-xl text-3xl font-serif leading-tight md:text-5xl"
         >
-          Speak Your Dreams.{" "}
-          <span className="text-primary italic">Listen To Your Future.</span>
+          Record Your Manifestation.{" "}
+          <span className="text-primary italic">We'll Turn It Into Daily Audio.</span>
         </motion.h1>
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="mb-10 max-w-md text-base text-muted-foreground leading-relaxed"
+          transition={{ delay: 0.5, duration: 0.7 }}
+          className="mb-10 max-w-md text-base text-muted-foreground leading-relaxed md:text-lg"
         >
-          Turn your desires into powerful manifestation audio you can listen to every day.
+          Speak your dream life in your own words. We'll perfect it into a powerful script and send it back as audio you can listen to every day.
         </motion.p>
+
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.1, duration: 0.6 }}
+          transition={{ delay: 0.8, duration: 0.5 }}
           whileTap={{ scale: 0.97 }}
-          onClick={onStart}
-          className="flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-lg shadow-primary/20 animate-breathe"
+          onClick={handleCTA}
+          className="flex items-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-lg shadow-primary/20"
         >
-          Create My Manifestation
+          Start My Recording
           <ArrowRight className="h-4 w-4" />
+        </motion.button>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.1, duration: 0.6 }}
+          className="mt-4 text-xs text-muted-foreground"
+        >
+          Limited beta — we're crafting the first 50 audios personally.
+        </motion.p>
+
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.3, duration: 0.5 }}
+          onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}
+          className="mt-8 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
+        >
+          See how it works
         </motion.button>
       </section>
 
       {/* How It Works */}
-      <section className="py-24 px-6">
+      <section id="how" className="py-24 px-6">
         <div className="mx-auto max-w-3xl">
           <h2 className="mb-16 text-center text-3xl font-serif">How it works</h2>
           <div className="grid gap-10 md:grid-cols-3">
@@ -79,15 +102,15 @@ const LandingPage = ({ onStart }: LandingPageProps) => {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Bottom CTA */}
       <section className="py-24 px-6 text-center">
         <h2 className="mb-4 text-2xl font-serif">Ready to start?</h2>
         <p className="mb-8 text-muted-foreground">Your daily ritual is one step away.</p>
         <button
-          onClick={onStart}
+          onClick={handleCTA}
           className="rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-lg shadow-primary/20"
         >
-          Create My Manifestation
+          Start My Recording
         </button>
       </section>
 
