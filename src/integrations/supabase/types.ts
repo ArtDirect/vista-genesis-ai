@@ -14,7 +14,136 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          created_at: string
+          event_name: string
+          id: string
+          page: string | null
+          submission_id: string | null
+          utm_campaign: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          id?: string
+          page?: string | null
+          submission_id?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          id?: string
+          page?: string | null
+          submission_id?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feedback: {
+        Row: {
+          created_at: string
+          email: string | null
+          feedback_text: string
+          id: string
+          submission_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          feedback_text: string
+          id?: string
+          submission_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          feedback_text?: string
+          id?: string
+          submission_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      submissions: {
+        Row: {
+          audio_file_path: string | null
+          audio_url: string | null
+          consent_given: boolean
+          created_at: string
+          email: string
+          id: string
+          input_type: string
+          polished_script: string | null
+          raw_text: string | null
+          status: string
+          transcript_text: string | null
+          utm_campaign: string | null
+          utm_source: string | null
+          voice_duration_seconds: number | null
+          voice_file_path: string | null
+          voice_file_url: string | null
+          voice_mime_type: string | null
+        }
+        Insert: {
+          audio_file_path?: string | null
+          audio_url?: string | null
+          consent_given?: boolean
+          created_at?: string
+          email: string
+          id?: string
+          input_type: string
+          polished_script?: string | null
+          raw_text?: string | null
+          status?: string
+          transcript_text?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+          voice_duration_seconds?: number | null
+          voice_file_path?: string | null
+          voice_file_url?: string | null
+          voice_mime_type?: string | null
+        }
+        Update: {
+          audio_file_path?: string | null
+          audio_url?: string | null
+          consent_given?: boolean
+          created_at?: string
+          email?: string
+          id?: string
+          input_type?: string
+          polished_script?: string | null
+          raw_text?: string | null
+          status?: string
+          transcript_text?: string | null
+          utm_campaign?: string | null
+          utm_source?: string | null
+          voice_duration_seconds?: number | null
+          voice_file_path?: string | null
+          voice_file_url?: string | null
+          voice_mime_type?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
