@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight } from "lucide-react";
-import { useAppStore } from "@/lib/store";
-import AudioPlayer from "./AudioPlayer";
-import BackgroundSoundPicker from "./BackgroundSoundPicker";
-
-const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const };
+import { ArrowRight, Pencil } from "lucide-react";
+import { useAppStore, logEvent } from "@/lib/store";
 
 const ScriptScreen = () => {
   const { manifestationScript, setManifestationScript, setStep } = useAppStore();
@@ -22,50 +18,41 @@ const ScriptScreen = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1 }}
-      className="min-h-[100dvh] gradient-twilight px-6 pb-24 pt-14"
+      transition={{ duration: 0.6 }}
+      className="flex min-h-[100dvh] flex-col px-6 pt-14 pb-8"
     >
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, ...slow }}
-        className="mb-8 text-center"
+        transition={{ delay: 0.2, duration: 0.6 }}
+        className="mb-6 text-center"
       >
-        <p className="mb-2 text-xs font-medium tracking-[0.4em] uppercase text-secondary/60">
-          Your visualization
-        </p>
-        <h2 className="text-2xl font-medium text-foreground">
-          <span className="italic text-gradient-dawn">Your imagined future</span>
-        </h2>
+        <h2 className="mb-2 text-2xl font-serif">Your Manifestation Script</h2>
+        <p className="text-sm text-muted-foreground">You can edit this to sound more like you.</p>
       </motion.div>
 
       {/* Script Card */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, ...slow }}
-        className="relative mb-6 rounded-2xl border border-border/30 bg-card/40 p-6 backdrop-blur-sm"
+        transition={{ delay: 0.4, duration: 0.6 }}
+        className="relative mb-6 rounded-2xl border border-border bg-card p-6 shadow-sm"
       >
-        <Sparkles className="absolute right-4 top-4 h-4 w-4 text-gold/60" />
-
         {isEditing ? (
           <>
             <textarea
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              rows={8}
-              className="w-full resize-none bg-transparent text-sm leading-relaxed text-foreground/90 focus:outline-none"
+              rows={10}
+              className="w-full resize-none bg-transparent text-sm leading-relaxed text-foreground focus:outline-none"
             />
             <div className="mt-4 flex gap-2">
-              <button
-                onClick={handleSave}
-                className="rounded-lg gradient-dawn px-4 py-2 text-xs font-medium text-primary-foreground"
-              >
+              <button onClick={handleSave} className="rounded-lg bg-primary px-4 py-2 text-xs font-medium text-primary-foreground">
                 Save
               </button>
               <button
                 onClick={() => { setIsEditing(false); setEditText(manifestationScript); }}
-                className="rounded-lg border border-border/30 px-4 py-2 text-xs text-muted-foreground"
+                className="rounded-lg border border-border px-4 py-2 text-xs text-muted-foreground"
               >
                 Cancel
               </button>
@@ -73,20 +60,17 @@ const ScriptScreen = () => {
           </>
         ) : (
           <>
-            <p className="whitespace-pre-line text-sm leading-[1.9] text-foreground/80 font-serif italic">
+            <p className="whitespace-pre-line text-sm leading-[1.8] text-foreground/80 font-serif italic">
               {manifestationScript}
             </p>
             <div className="mt-5 flex gap-4">
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-xs text-primary/80 hover:text-primary transition-colors"
+                className="flex items-center gap-1 text-xs text-primary hover:underline"
               >
-                Edit
+                <Pencil className="h-3 w-3" /> Edit
               </button>
-              <button
-                onClick={() => {}}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                 Regenerate
               </button>
             </div>
@@ -94,37 +78,20 @@ const ScriptScreen = () => {
         )}
       </motion.div>
 
-      {/* Background Sound Picker */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.9, ...slow }}
-        className="mb-6"
-      >
-        <BackgroundSoundPicker />
-      </motion.div>
+      <div className="flex-1" />
 
-      {/* Audio Player */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.1, ...slow }}
-        className="mb-8"
-      >
-        <AudioPlayer />
-      </motion.div>
-
-      {/* CTA */}
       <motion.button
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.3, ...slow }}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => setStep("ritual")}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl gradient-dawn px-8 py-4 text-base font-medium text-primary-foreground glow-sunrise"
+        transition={{ delay: 0.6, duration: 0.5 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={() => {
+          logEvent('script_confirmed');
+          setStep("audio");
+        }}
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-lg shadow-primary/20"
       >
-        Start your daily ritual
+        Generate My Visualization
         <ArrowRight className="h-4 w-4" />
       </motion.button>
     </motion.div>

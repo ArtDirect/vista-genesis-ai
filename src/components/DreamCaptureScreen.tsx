@@ -1,78 +1,84 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Mic, MicOff, ArrowRight, Keyboard } from "lucide-react";
-import { useAppStore } from "@/lib/store";
+import { useAppStore, logEvent } from "@/lib/store";
 
-const prompts = [
-  "I live in a beautiful home overlooking the ocean.",
-  "I wake up every morning with complete creative freedom.",
-  "I travel the world and work from wherever I choose.",
-  "I feel deeply connected to the people I love.",
+const placeholders = [
+  "I run a successful company.",
+  "I live near the ocean.",
+  "I feel confident speaking in public.",
+  "I wake up every morning excited about my work.",
 ];
-
-const slow = { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const };
 
 const DreamCaptureScreen = () => {
   const { setStep, setDreamText, dreamText } = useAppStore();
   const [isRecording, setIsRecording] = useState(false);
   const [showText, setShowText] = useState(false);
   const [localText, setLocalText] = useState(dreamText);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const timerRef = useRef<number | null>(null);
 
   const toggleRecording = () => {
     if (isRecording) {
       setIsRecording(false);
-      const mock = "I live in a beautiful home by the ocean, running a creative business that gives me complete freedom. I wake up every morning feeling abundant, inspired, and deeply connected to the life I've designed.";
+      if (timerRef.current) clearInterval(timerRef.current);
+      // Mock: simulate voice capture
+      const mock = "I want financial freedom and a successful business that lets me live near the ocean and travel the world.";
       setLocalText(mock);
+      setShowText(true);
+      setRecordingTime(0);
     } else {
       setIsRecording(true);
+      setRecordingTime(0);
+      timerRef.current = window.setInterval(() => {
+        setRecordingTime((t) => t + 1);
+      }, 1000);
     }
   };
 
   const handleContinue = () => {
     if (!localText.trim()) return;
     setDreamText(localText);
+    logEvent('dream_captured', { method: showText ? 'text' : 'voice', length: localText.length });
     setStep("generating");
   };
+
+  const formatTime = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1 }}
-      className="flex min-h-[100dvh] flex-col gradient-twilight px-6 pt-16 pb-8"
+      transition={{ duration: 0.6 }}
+      className="flex min-h-[100dvh] flex-col px-6 pt-16 pb-8"
     >
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, ...slow }}
-        className="mb-10 text-center"
+        transition={{ delay: 0.2, duration: 0.6 }}
+        className="mb-8 text-center"
       >
-        <p className="mb-3 text-xs font-medium tracking-[0.4em] uppercase text-secondary/60">
-          Imagination capture
-        </p>
-        <h2 className="mb-4 text-3xl font-medium text-foreground">
-          Describe the life
-          <br />
-          <span className="italic text-gradient-dawn">you want to see.</span>
+        <h2 className="mb-3 text-2xl font-serif">
+          Describe the life you want to create.
         </h2>
         <p className="text-sm text-muted-foreground">
           Speak or type — let your imagination flow
         </p>
       </motion.div>
 
+      {/* Placeholder prompts */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.8, duration: 1 }}
-        className="mb-8 space-y-2.5"
+        transition={{ delay: 0.4, duration: 0.6 }}
+        className="mb-6 space-y-2"
       >
-        {prompts.map((p, i) => (
+        {placeholders.map((p, i) => (
           <button
             key={i}
             onClick={() => { setLocalText(p); setShowText(true); }}
-            className="block w-full rounded-xl border border-border/30 bg-card/30 px-4 py-3.5 text-left text-sm text-muted-foreground/80 transition-all duration-500 hover:border-primary/20 hover:text-foreground hover:bg-card/50"
+            className="block w-full rounded-xl border border-border bg-card px-4 py-3 text-left text-sm text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
           >
             "{p}"
           </button>
@@ -81,66 +87,75 @@ const DreamCaptureScreen = () => {
 
       <div className="flex-1" />
 
+      {/* Text area */}
       {showText && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={slow}
           className="mb-6"
         >
           <textarea
-            ref={textareaRef}
             value={localText}
             onChange={(e) => setLocalText(e.target.value)}
             placeholder="Describe the life you imagine..."
             rows={4}
-            className="w-full resize-none rounded-xl border border-border/30 bg-card/50 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-primary/30 backdrop-blur-sm"
+            className="w-full resize-none rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </motion.div>
       )}
 
+      {/* Controls */}
       <div className="flex items-center justify-center gap-4">
         {!showText && (
           <button
             onClick={() => setShowText(true)}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-border/30 bg-card/30 text-muted-foreground transition-all duration-500 hover:text-foreground hover:border-primary/20"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
           >
             <Keyboard className="h-5 w-5" />
           </button>
         )}
 
-        <motion.button
-          whileTap={{ scale: 0.92 }}
+        <button
           onClick={toggleRecording}
-          className={`flex h-20 w-20 items-center justify-center rounded-full transition-all duration-700 ${
+          className={`flex h-20 w-20 items-center justify-center rounded-full transition-all ${
             isRecording
-              ? "gradient-dawn glow-sunrise animate-pulse-glow"
-              : "border-2 border-primary/30 bg-card/30 text-primary hover:border-primary/50"
+              ? "bg-destructive text-destructive-foreground animate-breathe shadow-lg shadow-destructive/30"
+              : "border-2 border-primary/30 bg-card text-primary hover:border-primary/50"
           }`}
         >
-          {isRecording ? (
-            <MicOff className="h-7 w-7 text-primary-foreground" />
-          ) : (
-            <Mic className="h-7 w-7" />
-          )}
-        </motion.button>
+          {isRecording ? <MicOff className="h-7 w-7" /> : <Mic className="h-7 w-7" />}
+        </button>
 
         {localText.trim() && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            whileTap={{ scale: 0.92 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleContinue}
-            className="flex h-12 w-12 items-center justify-center rounded-full gradient-dawn text-primary-foreground glow-sunrise"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/20"
           >
             <ArrowRight className="h-5 w-5" />
           </motion.button>
         )}
       </div>
 
-      <p className="mt-5 text-center text-xs text-muted-foreground/40">
-        {isRecording ? "Listening... tap to stop" : "Tap the mic to speak your dream"}
+      <p className="mt-4 text-center text-xs text-muted-foreground">
+        {isRecording ? `Recording… ${formatTime(recordingTime)}` : "Tap the mic to speak your dream"}
       </p>
+
+      {isRecording && (
+        <div className="mt-3 flex justify-center gap-3">
+          <button onClick={toggleRecording} className="rounded-full border border-border px-4 py-2 text-xs text-muted-foreground">
+            Re-record
+          </button>
+          <button
+            onClick={() => { toggleRecording(); }}
+            className="rounded-full bg-primary px-4 py-2 text-xs text-primary-foreground"
+          >
+            Use this
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 };
