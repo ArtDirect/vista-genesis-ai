@@ -19,7 +19,7 @@ const LandingPage = () => {
 
   const handleCTA = () => {
     trackEvent("cta_clicked", "/");
-    navigate("/create");
+    navigate("/ritual");
   };
 
   return (
