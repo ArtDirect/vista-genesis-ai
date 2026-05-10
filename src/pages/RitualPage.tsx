@@ -35,7 +35,7 @@ export default function RitualPage() {
   const [script, setScript] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [generatingStage, setGeneratingStage] = useState<"saving" | "polishing" | "voicing">("saving");
+  const [generatingStage, setGeneratingStage] = useState<"saving" | "transcribing" | "polishing" | "voicing">("saving");
   const [error, setError] = useState("");
 
   // script edit
@@ -119,17 +119,37 @@ export default function RitualPage() {
         const { data: u } = supabase.storage.from("manifestations").getPublicUrl(path);
         voice_file_url = u.publicUrl;
         voice_file_path = path;
-        // For now we use a brief placeholder for raw_text when voice — admin can transcribe later
-        if (!dreamText.trim()) raw = "[voice submission — pending transcription]";
       }
 
-      // 2. insert submission row
+      // 2. transcribe voice if recorded
+      let transcribedText = "";
+      if (mode === "voice" && voice_file_url) {
+        setGeneratingStage("transcribing");
+        const { data: txData, error: txErr } = await supabase.functions.invoke("transcribe-audio", {
+          body: { audio_url: voice_file_url },
+        });
+        if (txErr) {
+          console.error("Transcription failed, falling back to text input:", txErr);
+        } else {
+          transcribedText = txData?.transcript?.trim() || "";
+        }
+        if (transcribedText) {
+          raw = transcribedText;
+        } else if (dreamText.trim()) {
+          raw = dreamText.trim();
+        } else {
+          raw = "[voice submission — transcription failed]";
+        }
+      }
+
+      // 3. insert submission row
       const { data: ins, error: insErr } = await supabase
         .from("submissions")
         .insert({
           email: email.trim(),
           input_type: mode,
           raw_text: raw,
+          transcript_text: mode === "voice" ? (transcribedText || null) : null,
           voice_file_url,
           voice_file_path,
           voice_duration_seconds: mode === "voice" ? recordingTime : null,
@@ -146,11 +166,11 @@ export default function RitualPage() {
       setSubmissionId(subId);
       trackEvent("submitted", "/ritual", subId);
 
-      // 3. polish with GPT
+      // 4. polish with GPT — use real transcript for voice, typed text for text
       setGeneratingStage("polishing");
       const dreamForAI = mode === "text"
         ? dreamText.trim()
-        : "I want a life that feels calm, free, and aligned with who I really am.";
+        : (transcribedText || dreamText.trim() || "I want a life that feels calm, free, and aligned with who I really am.");
       const { data: polishData, error: polishErr } = await supabase.functions.invoke("polish-script", {
         body: { dream: dreamForAI, submission_id: subId },
       });
@@ -359,18 +379,21 @@ export default function RitualPage() {
               </div>
               <p className="text-xs uppercase tracking-[0.3em] text-primary/80 mb-4">
                 {generatingStage === "saving" && "Receiving"}
+                {generatingStage === "transcribing" && "Listening"}
                 {generatingStage === "polishing" && "Refining"}
                 {generatingStage === "voicing" && "Voicing"}
               </p>
               <h2 className="text-3xl md:text-4xl font-serif italic mb-4 max-w-md">
                 {generatingStage === "saving" && "Holding your dream."}
+                {generatingStage === "transcribing" && "Hearing your words."}
                 {generatingStage === "polishing" && "Shaping your future into words."}
                 {generatingStage === "voicing" && "Giving it a voice."}
               </h2>
               <p className="text-sm text-muted-foreground max-w-sm font-light">
+                {generatingStage === "saving" && "Saving your submission…"}
+                {generatingStage === "transcribing" && "Transcribing your voice recording…"}
                 {generatingStage === "polishing" && "GPT is crafting your manifestation script…"}
                 {generatingStage === "voicing" && "ElevenLabs is recording your audio in a calm, grounded voice…"}
-                {generatingStage === "saving" && "Saving your submission…"}
               </p>
               <Loader2 className="mt-8 h-5 w-5 text-primary animate-spin" />
             </motion.div>
