@@ -14,7 +14,41 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    if (!submission_id || typeof submission_id !== "string") {
+      return new Response(JSON.stringify({ error: "submission_id is required" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // ── Verify the submission exists ──
+    const verifyResp = await fetch(
+      `${SUPABASE_URL}/rest/v1/submissions?id=eq.${submission_id}&select=id,polished_script`,
+      {
+        headers: {
+          apikey: SERVICE_KEY,
+          Authorization: `Bearer ${SERVICE_KEY}`,
+        },
+      }
+    );
+    const rows = await verifyResp.json();
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return new Response(JSON.stringify({ error: "Invalid submission" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Return cached script if already polished
+    if (rows[0].polished_script) {
+      return new Response(JSON.stringify({ script: rows[0].polished_script, cached: true }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── Generate polished script ──
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -67,20 +101,17 @@ Output ONLY the script lines. No headers, no explanation, no quotes.`;
     const data = await aiResp.json();
     const script = data.choices?.[0]?.message?.content?.trim() || "";
 
-    if (submission_id) {
-      const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-      const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      await fetch(`${SUPABASE_URL}/rest/v1/submissions?id=eq.${submission_id}`, {
-        method: "PATCH",
-        headers: {
-          apikey: SERVICE_KEY,
-          Authorization: `Bearer ${SERVICE_KEY}`,
-          "Content-Type": "application/json",
-          Prefer: "return=minimal",
-        },
-        body: JSON.stringify({ polished_script: script, raw_text: dream }),
-      });
-    }
+    // ── Update submission with polished script ──
+    await fetch(`${SUPABASE_URL}/rest/v1/submissions?id=eq.${submission_id}`, {
+      method: "PATCH",
+      headers: {
+        apikey: SERVICE_KEY,
+        Authorization: `Bearer ${SERVICE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({ polished_script: script, raw_text: dream }),
+    });
 
     return new Response(JSON.stringify({ script }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },

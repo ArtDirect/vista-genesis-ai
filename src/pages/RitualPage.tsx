@@ -121,35 +121,13 @@ export default function RitualPage() {
         voice_file_path = path;
       }
 
-      // 2. transcribe voice if recorded
-      let transcribedText = "";
-      if (mode === "voice" && voice_file_url) {
-        setGeneratingStage("transcribing");
-        const { data: txData, error: txErr } = await supabase.functions.invoke("transcribe-audio", {
-          body: { audio_url: voice_file_url },
-        });
-        if (txErr) {
-          console.error("Transcription failed, falling back to text input:", txErr);
-        } else {
-          transcribedText = txData?.transcript?.trim() || "";
-        }
-        if (transcribedText) {
-          raw = transcribedText;
-        } else if (dreamText.trim()) {
-          raw = dreamText.trim();
-        } else {
-          raw = "[voice submission — transcription failed]";
-        }
-      }
-
-      // 3. insert submission row
+      // 2. insert submission row FIRST (so we have a submission_id for auth)
       const { data: ins, error: insErr } = await supabase
         .from("submissions")
         .insert({
           email: email.trim(),
           input_type: mode,
           raw_text: raw,
-          transcript_text: mode === "voice" ? (transcribedText || null) : null,
           voice_file_url,
           voice_file_path,
           voice_duration_seconds: mode === "voice" ? recordingTime : null,
@@ -165,6 +143,25 @@ export default function RitualPage() {
       const subId = ins.id as string;
       setSubmissionId(subId);
       trackEvent("submitted", "/ritual", subId);
+
+      // 3. transcribe voice if recorded (now with submission_id for auth)
+      let transcribedText = "";
+      if (mode === "voice" && voice_file_url) {
+        setGeneratingStage("transcribing");
+        const { data: txData, error: txErr } = await supabase.functions.invoke("transcribe-audio", {
+          body: { audio_url: voice_file_url, submission_id: subId },
+        });
+        if (txErr) {
+          console.error("Transcription failed, falling back to text input:", txErr);
+        } else {
+          transcribedText = txData?.transcript?.trim() || "";
+        }
+        if (transcribedText) {
+          raw = transcribedText;
+        } else if (dreamText.trim()) {
+          raw = dreamText.trim();
+        }
+      }
 
       // 4. polish with GPT — use real transcript for voice, typed text for text
       setGeneratingStage("polishing");
