@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Play, Copy, Check, Eye, X, RefreshCw } from "lucide-react";
-
-const ADMIN_PASSWORD = "manifest2026";
+import { Play, Copy, Check, Eye, X, RefreshCw, LogOut } from "lucide-react";
 
 interface Submission {
   id: string;
@@ -21,13 +19,68 @@ interface Submission {
 }
 
 const AdminPage = () => {
-  const [authed, setAuthed] = useState(false);
-  const [password, setPassword] = useState("");
+  const [authState, setAuthState] = useState<"loading" | "login" | "authed" | "denied">("loading");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selected, setSelected] = useState<Submission | null>(null);
   const [editScript, setEditScript] = useState("");
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Check auth state on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setAuthState("login");
+        return;
+      }
+      // Check if user is in admins table
+      const { data, error } = await supabase.from("admins").select("user_id").eq("user_id", session.user.id).maybeSingle();
+      if (error || !data) {
+        setAuthState("denied");
+      } else {
+        setAuthState("authed");
+      }
+    };
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!session) {
+        setAuthState("login");
+        return;
+      }
+      const { data } = await supabase.from("admins").select("user_id").eq("user_id", session.user.id).maybeSingle();
+      setAuthState(data ? "authed" : "denied");
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    setLoginLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
+    if (error) {
+      setLoginError(error.message);
+    }
+    setLoginLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setAuthState("login");
+    setSubmissions([]);
+    setSelected(null);
+  };
 
   const loadSubmissions = useCallback(async () => {
     const { data } = await supabase
@@ -38,37 +91,17 @@ const AdminPage = () => {
   }, []);
 
   useEffect(() => {
-    if (authed) loadSubmissions();
-  }, [authed, loadSubmissions]);
+    if (authState === "authed") loadSubmissions();
+  }, [authState, loadSubmissions]);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password === ADMIN_PASSWORD) setAuthed(true);
-  };
-
-  const updateSubmission = async (id: string, updates: Record<string, any>) => {
+  const updateSubmission = async (id: string, updates: Record<string, unknown>) => {
     setSaving(true);
     await supabase.from("submissions").update(updates).eq("id", id);
     await loadSubmissions();
     if (selected?.id === id) {
-      setSelected((prev) => prev ? { ...prev, ...updates } : null);
+      setSelected((prev) => prev ? { ...prev, ...updates } as Submission : null);
     }
     setSaving(false);
-  };
-
-  const generateMockScript = (sub: Submission) => {
-    const source = sub.transcript_text || sub.raw_text || "";
-    const lines = [
-      `I am creating the life I truly desire.`,
-      `Every day, I move closer to my vision.`,
-      source ? `I choose: ${source.slice(0, 120)}` : `I am worthy of everything I dream of.`,
-      `My actions align with my deepest intentions.`,
-      `I am open to receiving abundance in all forms.`,
-      `I trust the process of my unfolding.`,
-      `I am calm, clear, and connected to my purpose.`,
-      `My future self is grateful for the choices I make today.`,
-    ];
-    return lines.join("\n");
   };
 
   const copyEmailTemplate = (sub: Submission) => {
@@ -85,33 +118,79 @@ const AdminPage = () => {
     sent: "bg-muted text-muted-foreground",
   };
 
-  if (!authed) {
+  // ── Loading ──
+  if (authState === "loading") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Checking access…</p>
+      </div>
+    );
+  }
+
+  // ── Login ──
+  if (authState === "login") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
         <form onSubmit={handleLogin} className="w-full max-w-sm">
-          <h1 className="mb-6 text-2xl font-serif text-center">Admin</h1>
+          <h1 className="mb-2 text-2xl font-serif text-center">Admin</h1>
+          <p className="mb-6 text-sm text-muted-foreground text-center">Sign in with your admin account.</p>
+          <input
+            type="email"
+            value={loginEmail}
+            onChange={(e) => setLoginEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
           <input
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
             placeholder="Password"
             className="w-full rounded-xl border border-border bg-card px-4 py-3 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
-          <button className="w-full rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground">
-            Enter
+          {loginError && <p className="mb-3 text-sm text-destructive text-center">{loginError}</p>}
+          <button
+            disabled={loginLoading}
+            className="w-full rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          >
+            {loginLoading ? "Signing in…" : "Sign In"}
           </button>
         </form>
       </div>
     );
   }
 
+  // ── Denied (logged in but not an admin) ──
+  if (authState === "denied") {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6 text-center">
+        <div>
+          <h1 className="mb-2 text-2xl font-serif">Access Denied</h1>
+          <p className="mb-6 text-sm text-muted-foreground">Your account doesn't have admin access.</p>
+          <button
+            onClick={handleLogout}
+            className="rounded-full border border-border px-6 py-3 text-sm text-muted-foreground hover:text-foreground"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Authed admin ──
   return (
     <div className="min-h-screen bg-background text-foreground p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-serif">Submissions</h1>
-        <button onClick={loadSubmissions} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <RefreshCw className="h-4 w-4" /> Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          <button onClick={loadSubmissions} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <RefreshCw className="h-4 w-4" /> Refresh
+          </button>
+          <button onClick={handleLogout} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+            <LogOut className="h-4 w-4" /> Sign out
+          </button>
+        </div>
       </div>
 
       {/* Table */}
@@ -208,21 +287,7 @@ const AdminPage = () => {
 
               {/* Polished Script */}
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-muted-foreground">Polished Script:</span>
-                  {!selected.polished_script && (
-                    <button
-                      onClick={() => {
-                        const script = generateMockScript(selected);
-                        setEditScript(script);
-                        updateSubmission(selected.id, { polished_script: script, status: "polishing" });
-                      }}
-                      className="text-xs text-primary hover:underline"
-                    >
-                      Generate Script
-                    </button>
-                  )}
-                </div>
+                <span className="text-muted-foreground block mb-1">Polished Script:</span>
                 <textarea
                   value={editScript}
                   onChange={(e) => setEditScript(e.target.value)}
