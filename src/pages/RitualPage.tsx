@@ -521,10 +521,20 @@ export default function RitualPage() {
               </a>
 
               <button
-                onClick={() => navigate("/thanks")}
+                onClick={() => navigate(user ? "/my-audios" : "/thanks")}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-coral hover:scale-[1.01] transition-transform"
               >
-                Finish ritual <ArrowRight className="h-4 w-4" />
+                {user ? "Go to My Rituals" : "Finish ritual"} <ArrowRight className="h-4 w-4" />
+              </button>
+
+              {!user && (
+                <button
+                  onClick={() => navigate("/login")}
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-border px-8 py-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Sign in to save your rituals
+                </button>
+              )}
               </button>
             </motion.div>
           )}

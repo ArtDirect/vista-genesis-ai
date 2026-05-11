@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Mic, Sparkles, Headphones } from "lucide-react";
 import { trackEvent } from "@/lib/events";
+import { useAuth } from "@/lib/auth";
 
 const steps = [
   { icon: Mic, num: "1", title: "Record your manifestation", desc: "Messy is fine. Just speak from the heart." },
@@ -12,6 +13,7 @@ const steps = [
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     trackEvent("page_view", "/");
@@ -24,8 +26,21 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Nav */}
+      {user && (
+        <div className="fixed top-0 left-0 right-0 z-30 px-6 py-4 flex items-center justify-between bg-background/80 backdrop-blur-lg border-b border-border">
+          <span className="text-lg font-serif italic text-primary">ManifestFlow</span>
+          <Link
+            to="/my-audios"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground"
+          >
+            <Headphones className="h-3.5 w-3.5" /> My Rituals
+          </Link>
+        </div>
+      )}
+
       {/* Hero */}
-      <section className="flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center">
+      <section className={`flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center ${user ? "pt-16" : ""}`}>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
