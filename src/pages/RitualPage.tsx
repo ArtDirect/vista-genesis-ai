@@ -535,7 +535,6 @@ export default function RitualPage() {
                   Sign in to save your rituals
                 </button>
               )}
-              </button>
             </motion.div>
           )}
         </AnimatePresence>
