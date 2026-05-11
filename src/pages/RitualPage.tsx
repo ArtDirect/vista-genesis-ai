@@ -5,6 +5,7 @@ import { Mic, Square, Keyboard, ArrowRight, Loader2, Pencil, Play, Pause, Rotate
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent } from "@/lib/events";
 import { getUtmParams } from "@/lib/utm";
+import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
 type Step = "capture" | "generating" | "script" | "audio";
@@ -22,7 +23,13 @@ export default function RitualPage() {
   // capture state
   const [mode, setMode] = useState<"voice" | "text">("voice");
   const [dreamText, setDreamText] = useState("");
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
+
+  // Auto-fill email from session
+  useEffect(() => {
+    if (user?.email && !email) setEmail(user.email);
+  }, [user]);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -126,6 +133,7 @@ export default function RitualPage() {
         .from("submissions")
         .insert({
           email: email.trim(),
+          user_id: user?.id ?? null,
           input_type: mode,
           raw_text: raw,
           voice_file_url,

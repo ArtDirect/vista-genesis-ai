@@ -2,9 +2,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "@/lib/auth";
 import LandingPage from "./pages/LandingPage";
-import CreatePage from "./pages/CreatePage";
+import LoginPage from "./pages/LoginPage";
 import RitualPage from "./pages/RitualPage";
 import ThanksPage from "./pages/ThanksPage";
 import AdminPage from "./pages/AdminPage";
@@ -17,16 +18,19 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/create" element={<CreatePage />} />
-          <Route path="/ritual" element={<RitualPage />} />
-          <Route path="/thanks" element={<ThanksPage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/create" element={<Navigate to="/ritual" replace />} />
+            <Route path="/ritual" element={<RitualPage />} />
+            <Route path="/thanks" element={<ThanksPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
