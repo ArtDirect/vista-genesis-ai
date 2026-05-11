@@ -14,6 +14,21 @@ export type Database = {
   }
   public: {
     Tables: {
+      admins: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string
@@ -84,6 +99,38 @@ export type Database = {
           },
         ]
       }
+      listening_log: {
+        Row: {
+          duration_seconds: number | null
+          id: string
+          listened_at: string
+          submission_id: string
+          user_id: string
+        }
+        Insert: {
+          duration_seconds?: number | null
+          id?: string
+          listened_at?: string
+          submission_id: string
+          user_id: string
+        }
+        Update: {
+          duration_seconds?: number | null
+          id?: string
+          listened_at?: string
+          submission_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listening_log_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       submissions: {
         Row: {
           audio_file_path: string | null
@@ -93,10 +140,14 @@ export type Database = {
           email: string
           id: string
           input_type: string
+          last_listened_at: string | null
+          listen_count: number
           polished_script: string | null
           raw_text: string | null
           status: string
+          title: string | null
           transcript_text: string | null
+          user_id: string | null
           utm_campaign: string | null
           utm_source: string | null
           voice_duration_seconds: number | null
@@ -112,10 +163,14 @@ export type Database = {
           email: string
           id?: string
           input_type: string
+          last_listened_at?: string | null
+          listen_count?: number
           polished_script?: string | null
           raw_text?: string | null
           status?: string
+          title?: string | null
           transcript_text?: string | null
+          user_id?: string | null
           utm_campaign?: string | null
           utm_source?: string | null
           voice_duration_seconds?: number | null
@@ -131,10 +186,14 @@ export type Database = {
           email?: string
           id?: string
           input_type?: string
+          last_listened_at?: string | null
+          listen_count?: number
           polished_script?: string | null
           raw_text?: string | null
           status?: string
+          title?: string | null
           transcript_text?: string | null
+          user_id?: string | null
           utm_campaign?: string | null
           utm_source?: string | null
           voice_duration_seconds?: number | null
@@ -149,7 +208,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
