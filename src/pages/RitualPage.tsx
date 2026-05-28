@@ -209,15 +209,45 @@ export default function RitualPage() {
     setStep("generating");
     setGenerating(true);
     setGeneratingStage("voicing");
+    trackEvent("audio_requested", "/ritual", submissionId);
     try {
       const { data, error: aErr } = await supabase.functions.invoke("generate-audio", {
         body: { script: final, submission_id: submissionId },
       });
+
+      // supabase.functions.invoke surfaces non-2xx as `error` with the raw Response in error.context.
+      // Pull the structured body so we can branch on data.error codes.
+      let body: any = data;
+      if (aErr && (aErr as any).context && typeof (aErr as any).context.json === "function") {
+        try { body = await (aErr as any).context.json(); } catch { /* keep aErr.message */ }
+      }
+
+      if (body?.error === "sign_in_required") {
+        setGenerating(false);
+        setStep("script");
+        toast.info(body.message || "Sign in to create more audios.", {
+          action: { label: "Sign in", onClick: () => navigate("/login") },
+        });
+        return;
+      }
+      if (body?.error === "out_of_credits") {
+        setGenerating(false);
+        setStep("script");
+        toast.info(body.message || "You're out of credits.");
+        return;
+      }
+      if (body?.error === "audio_generation_failed" || body?.retryable) {
+        setGenerating(false);
+        setStep("script");
+        toast.error(body.message || "Audio generation failed. Try again.");
+        return;
+      }
       if (aErr) throw aErr;
-      const url = data?.audio_url;
+
+      const url = body?.audio_url;
       if (!url) throw new Error("No audio returned");
       setAudioUrl(url);
-      trackEvent("audio_generated", "/ritual", submissionId);
+      // audio_generated is logged server-side by generate-audio — don't duplicate.
       setGenerating(false);
       setStep("audio");
     } catch (e: any) {
