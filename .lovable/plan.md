@@ -1,74 +1,54 @@
-# Handover to Claude Code
+# Give Claude Code local access to this project
 
-I'll create a single `HANDOVER.md` at the project root that gives Claude Code everything it needs to pick this project up without re-discovering it.
+No code changes — this is a setup checklist you run once. Claude Code then clones the repo, runs it locally, and talks to the same Lovable Cloud backend.
 
-## What goes in HANDOVER.md
+## 1. Make the GitHub repo reachable
 
-**1. Project snapshot**
-- Product: mobile-first manifestation MVP (Dream → Polished Script → Voiced Audio)
-- Stack: Vite + React + TS + Tailwind + shadcn, Supabase (Lovable Cloud), ElevenLabs, Lovable AI Gateway (`openai/gpt-5`, Whisper)
-- Theme: dark indigo `#0D0D2B`, coral `#C8573A`, Cormorant Garamond / DM Sans
+The repo `ArtDirect/vista-genesis-ai` is currently private (404 unauthenticated). Pick one:
 
-**2. Routes & pages**
-- `/` LandingPage → `/ritual`
-- `/ritual` 4-step flow (Capture → Loading → Script → Audio) — `src/pages/RitualPage.tsx`
-- `/login` magic link + password — `src/pages/LoginPage.tsx`
-- `/my-audios` user library w/ listen count — `src/pages/MyAudiosPage.tsx`
-- `/admin` admin dashboard, gated by `public.admins` table (no more `manifest2026` password)
-- `/thanks`, `/create` (→ redirect to `/ritual`)
+- **Recommended — invite as collaborator:** GitHub → repo → Settings → Collaborators → add the GitHub username that Claude Code will use. Keeps the repo private.
+- **Or make public:** repo → Settings → General → Danger Zone → Change visibility → Public. Easiest, but anyone can read the code (no secrets are committed, so this is safe — `.env` is gitignored).
 
-**3. Backend (Lovable Cloud / Supabase)**
-- Tables with current columns + RLS summary: `submissions`, `events`, `feedback`, `admins`, `listening_log`
-- `is_admin()` SECURITY DEFINER function
-- Storage bucket: `manifestations` (public)
-- Realtime: not enabled
-- Known linter notes (intentional): public storage bucket, `is_admin` callable
+## 2. Clone + install locally (Claude Code runs these)
 
-**4. Edge functions** (`supabase/functions/`)
-- `polish-script` — GPT-5 via Lovable AI Gateway, caches in `submissions.polished_script`
-- `generate-audio` — ElevenLabs TTS, rate-limited 5/email, uploads to `manifestations` bucket
-- `transcribe-audio` — Whisper via Gateway w/ OpenAI fallback
-- All deploy auto via Lovable; `verify_jwt = false` default
+```sh
+git clone git@github.com:ArtDirect/vista-genesis-ai.git
+cd vista-genesis-ai
+npm i
+```
 
-**5. Secrets configured**
-- `LOVABLE_API_KEY`, `ELEVENLABS_API_KEY` (connector-managed), Supabase keys
-- Note: ElevenLabs free-tier may be blocked; user may need a paid key
+## 3. Provide the two frontend env vars
 
-**6. Auth**
-- Supabase email/password + magic link; Google not yet enabled
-- Admin = row in `public.admins` (user must insert their auth uid manually)
+The repo has `.env.example`. Create a local `.env` with the Lovable Cloud publishable values (safe to share, already in the client bundle):
 
-**7. Tracking / analytics**
-- `trackEvent()` in `src/lib/events.ts` writes to `events` table with UTM
-- See `src/lib/utm.ts`
+```
+VITE_SUPABASE_URL=https://ydakiibqaciinvxjbezy.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkYWtpaWJxYWNpaW52eGpiZXp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxMzQ5NzAsImV4cCI6MjA4ODcxMDk3MH0.bUwZ0lEDLyMT37T__0VP3WwW5xQv8z85SkgyQpIqxAc
+VITE_SUPABASE_PROJECT_ID=ydakiibqaciinvxjbezy
+```
 
-**8. Key files for Claude Code to read first**
-- `src/App.tsx` (routes)
-- `src/pages/RitualPage.tsx` (core flow)
-- `src/lib/auth.tsx`
-- `supabase/functions/*/index.ts`
-- `src/index.css` + `tailwind.config.ts` (design tokens)
-- `src/integrations/supabase/client.ts` & `types.ts` (auto-generated — don't edit)
+Then `npm run dev` → localhost:8080, talking to the live Lovable Cloud backend.
 
-**9. Conventions / guardrails**
-- Never edit `src/integrations/supabase/client.ts`, `types.ts`, or `.env`
-- All DB changes via migrations
-- Use semantic tokens in `index.css`, not raw colors
-- Roles in `admins` table only, never on profile
+## 4. Two-way sync expectations
 
-**10. Open items / known issues**
-- ElevenLabs free-tier abuse-detection error possible
-- Google OAuth not wired
-- No automated tests beyond `src/test/example.test.ts`
-- Admin user must be seeded manually via SQL insert into `public.admins`
+- Claude Code pushes to GitHub → Lovable auto-pulls into the preview/published app.
+- You edit in Lovable → Lovable pushes to GitHub → Claude Code pulls.
+- **Do not** let Claude Code edit `src/integrations/supabase/client.ts`, `src/integrations/supabase/types.ts`, or `.env` — those are Lovable-managed and will get clobbered on next sync. `HANDOVER.md` already calls this out.
 
-**11. How to run locally**
-- `npm i && npm run dev` (port 8080)
-- `.env` is auto-provided in Lovable; for local, copy from `.env.example` with real Supabase URL + publishable key
+## 5. What Claude Code cannot do from local
 
-**12. Deployment**
-- Frontend: Lovable auto-deploy from GitHub
-- Edge functions: auto-deploy on push
-- Migrations: via Lovable migration tool (not raw `supabase db push`)
+Local access lets it edit code and run the frontend. It **cannot** from a local clone:
 
-That's the whole deliverable — one markdown file Claude Code can read top-to-bottom to be productive immediately. Want me to also include a short "next tasks" section, or keep it pure handover?
+- Apply DB migrations to Lovable Cloud (no service-role key in scope #1)
+- Deploy edge functions (they auto-deploy via GitHub push — so this works, just via commit, not via `supabase functions deploy`)
+- Read/write `events`, `submissions`, etc. as admin
+
+If you later want Claude Code to do those things too, come back and we'll switch to the "Full backend access" path (service-role key + ElevenLabs key as local env vars).
+
+## 6. Point Claude Code at `HANDOVER.md` first
+
+Tell it: *"Read `HANDOVER.md` end-to-end before touching anything."* That doc already has the schema, routes, edge-function contracts, and guardrails — it'll save a full discovery pass.
+
+---
+
+That's the whole setup. Want me to also draft a short `CLAUDE.md` at the repo root with the "read HANDOVER first + don't touch these files" instructions baked in, so Claude Code picks it up automatically?
