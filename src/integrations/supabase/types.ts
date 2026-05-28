@@ -203,11 +203,40 @@ export type Database = {
         }
         Relationships: []
       }
+      user_credits: {
+        Row: {
+          balance: number
+          created_at: string
+          total_granted: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          total_granted?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          total_granted?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      consume_credit: { Args: { p_user_id: string }; Returns: number }
+      grant_credits: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: number
+      }
       is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
