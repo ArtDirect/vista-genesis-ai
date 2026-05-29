@@ -55,6 +55,10 @@ export default function RitualPage() {
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
 
+  // payoff-screen "save my ritual" flow
+  const [savedEmail, setSavedEmail] = useState(false);
+  const [savingEmail, setSavingEmail] = useState(false);
+
   useEffect(() => {
     trackEvent("ritual_page_view", "/ritual");
   }, []);
@@ -108,12 +112,11 @@ export default function RitualPage() {
 
   // ---- Submission pipeline ----
   const canSubmit =
-    email.trim().includes("@") &&
-    ((mode === "voice" && audioBlob) || (mode === "text" && dreamText.trim().length > 10));
+    (mode === "voice" && audioBlob) || (mode === "text" && dreamText.trim().length > 10);
 
   const handleBeginRitual = async () => {
     if (!canSubmit) {
-      setError("Please add your email and your dream.");
+      setError("Please share your dream first.");
       return;
     }
     setError("");
@@ -144,7 +147,7 @@ export default function RitualPage() {
       const { data: ins, error: insErr } = await supabase
         .from("submissions")
         .insert({
-          email: email.trim(),
+          email: user?.email ?? null,
           user_id: user?.id ?? null,
           input_type: mode,
           raw_text: raw,
@@ -271,6 +274,30 @@ export default function RitualPage() {
     }
   };
 
+  // ---- Save my ritual (payoff screen, anonymous users) ----
+  const handleSaveEmail = async () => {
+    if (!submissionId) return;
+    if (!email.trim().includes("@")) {
+      setError("Please enter a valid email.");
+      return;
+    }
+    setError("");
+    setSavingEmail(true);
+    try {
+      const { error: sErr } = await supabase.functions.invoke("save-email", {
+        body: { submission_id: submissionId, email: email.trim() },
+      });
+      if (sErr) throw sErr;
+      setSavedEmail(true);
+      trackEvent("email_saved", "/ritual", submissionId);
+      toast.success("Saved. We'll send it to your inbox.");
+    } catch (e: any) {
+      toast.error(e?.message || "Couldn't save. Please try again.");
+    } finally {
+      setSavingEmail(false);
+    }
+  };
+
   // ---- Audio playback ----
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -383,19 +410,6 @@ export default function RitualPage() {
                   </div>
                 </div>
               )}
-
-              <div className="mb-5">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  className="w-full rounded-full border border-border bg-card/40 backdrop-blur px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
-                <p className="mt-2 text-xs text-muted-foreground/70 text-center">
-                  We'll send your finished audio here.
-                </p>
-              </div>
 
               {error && <p className="mb-4 text-center text-sm text-destructive">{error}</p>}
 
@@ -562,20 +576,54 @@ export default function RitualPage() {
                 <Download className="h-3.5 w-3.5" /> Download audio
               </a>
 
-              <button
-                onClick={() => navigate(user ? "/my-audios" : "/thanks")}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-coral hover:scale-[1.01] transition-transform"
-              >
-                {user ? "Go to My Rituals" : "Finish ritual"} <ArrowRight className="h-4 w-4" />
-              </button>
-
-              {!user && (
+              {user ? (
                 <button
-                  onClick={() => navigate("/login")}
-                  className="flex w-full items-center justify-center gap-2 rounded-full border border-border px-8 py-3 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => navigate("/my-audios")}
+                  className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground shadow-coral hover:scale-[1.01] transition-transform"
                 >
-                  Sign in to save your rituals
+                  Go to My Rituals <ArrowRight className="h-4 w-4" />
                 </button>
+              ) : savedEmail ? (
+                <div className="rounded-2xl border border-border bg-card/40 p-5 text-center">
+                  <p className="text-sm text-foreground mb-1">Saved to your inbox.</p>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Create an account to build a daily streak and keep all your rituals in one place.
+                  </p>
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow-coral hover:scale-[1.01] transition-transform"
+                  >
+                    Create an account <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-border bg-card/40 p-5">
+                  <p className="text-sm text-center text-foreground mb-1">Keep this ritual.</p>
+                  <p className="text-xs text-center text-muted-foreground mb-4">
+                    We'll send the audio to your inbox so you can listen every morning.
+                  </p>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className="mb-3 w-full rounded-full border border-border bg-background/60 px-5 py-3 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                  {error && <p className="mb-3 text-center text-sm text-destructive">{error}</p>}
+                  <button
+                    onClick={handleSaveEmail}
+                    disabled={savingEmail}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow-coral disabled:opacity-50 hover:scale-[1.01] transition-transform"
+                  >
+                    {savingEmail ? "Saving…" : "Email me my ritual"} <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate("/thanks")}
+                    className="mt-2 w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Skip for now
+                  </button>
+                </div>
               )}
             </motion.div>
           )}
