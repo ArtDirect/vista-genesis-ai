@@ -21,6 +21,16 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Cap input length: a genuine dream is a few sentences. This stops a
+    // crafted oversized payload from running up GPT token costs.
+    const MAX_DREAM_CHARS = 5000;
+    if (dream.length > MAX_DREAM_CHARS) {
+      return new Response(JSON.stringify({ error: "Dream is too long." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 

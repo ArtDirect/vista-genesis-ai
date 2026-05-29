@@ -17,6 +17,11 @@ Deno.serve(async (req) => {
     if (!script || typeof script !== "string") return json({ error: "script is required" }, 400);
     if (!submission_id || typeof submission_id !== "string") return json({ error: "submission_id is required" }, 400);
 
+    // Cap script length before the (per-character billed) TTS call. A real
+    // 8–12 line script is well under this; the edit box lets users paste anything.
+    const MAX_SCRIPT_CHARS = 5000;
+    if (script.length > MAX_SCRIPT_CHARS) return json({ error: "Script is too long." }, 400);
+
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;

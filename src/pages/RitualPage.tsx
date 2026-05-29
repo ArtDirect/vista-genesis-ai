@@ -59,6 +59,18 @@ export default function RitualPage() {
     trackEvent("ritual_page_view", "/ritual");
   }, []);
 
+  // Stop the recorder, timer, and mic tracks if the user leaves mid-recording.
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== "inactive") {
+        recorder.stream?.getTracks().forEach((t) => t.stop());
+        recorder.stop();
+      }
+    };
+  }, []);
+
   // ---- Voice recording ----
   const startRecording = useCallback(async () => {
     setError("");
