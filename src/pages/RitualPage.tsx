@@ -59,6 +59,10 @@ export default function RitualPage() {
   const [savedEmail, setSavedEmail] = useState(false);
   const [savingEmail, setSavingEmail] = useState(false);
 
+  // background audio prefetch (start voicing while the user reads the script)
+  const prefetchRef = useRef<{ script: string; promise: Promise<any> } | null>(null);
+  const prefetchTimerRef = useRef<number | null>(null);
+
   useEffect(() => {
     trackEvent("ritual_page_view", "/ritual");
   }, []);
@@ -67,6 +71,7 @@ export default function RitualPage() {
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (prefetchTimerRef.current) clearTimeout(prefetchTimerRef.current);
       const recorder = mediaRecorderRef.current;
       if (recorder && recorder.state !== "inactive") {
         recorder.stream?.getTracks().forEach((t) => t.stop());
@@ -203,6 +208,10 @@ export default function RitualPage() {
 
       setGenerating(false);
       setStep("script");
+
+      // Start voicing in the background after a short beat (skips instant bounces),
+      // so confirming the script feels instant. Regeneration on edit is handled in confirm.
+      prefetchTimerRef.current = window.setTimeout(() => startAudioPrefetch(polished, subId), 1200);
     } catch (e: any) {
       console.error(e);
       setError(e?.message || "Something went wrong.");
@@ -211,8 +220,23 @@ export default function RitualPage() {
     }
   };
 
+  // Single place that calls the voicing function — used by both prefetch and confirm.
+  const invokeGenerateAudio = (scriptText: string, subId: string) =>
+    supabase.functions.invoke("generate-audio", { body: { script: scriptText, submission_id: subId } });
+
+  // Speculatively voice the script while the user reads it, so confirming feels
+  // instant. Safe on cost: the credit/free-audio gate returns BEFORE any TTS work
+  // when the user is out of quota, so a no-quota prefetch generates (and bills) nothing.
+  const startAudioPrefetch = (scriptText: string, subId: string) => {
+    if (prefetchRef.current?.script === scriptText) return; // already prefetching this exact script
+    const promise = invokeGenerateAudio(scriptText, subId);
+    promise.catch(() => {}); // confirm re-awaits and handles errors; avoid an unhandled rejection here
+    prefetchRef.current = { script: scriptText, promise };
+  };
+
   const handleConfirmScript = async () => {
     if (!submissionId) return;
+    if (prefetchTimerRef.current) { clearTimeout(prefetchTimerRef.current); prefetchTimerRef.current = null; }
     const final = editingScript ? scriptDraft : script;
     setScript(final);
     setEditingScript(false);
@@ -226,9 +250,17 @@ export default function RitualPage() {
     setGeneratingStage("voicing");
     trackEvent("audio_requested", "/ritual", submissionId);
     try {
-      const { data, error: aErr } = await supabase.functions.invoke("generate-audio", {
-        body: { script: final, submission_id: submissionId },
-      });
+      // If a prefetch for a DIFFERENT script is still in flight (user edited),
+      // let it settle first so the regeneration below sees audio_url already set
+      // — this avoids a concurrent double-charge for the same submission.
+      if (prefetchRef.current && prefetchRef.current.script !== final) {
+        try { await prefetchRef.current.promise; } catch { /* ignore */ }
+      }
+      const usePrefetch = prefetchRef.current?.script === final;
+      const { data, error: aErr } = usePrefetch
+        ? await prefetchRef.current!.promise
+        : await invokeGenerateAudio(final, submissionId);
+      prefetchRef.current = null;
 
       // supabase.functions.invoke surfaces non-2xx as `error` with the raw Response in error.context.
       // Pull the structured body so we can branch on data.error codes.

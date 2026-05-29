@@ -50,16 +50,24 @@ Deno.serve(async (req) => {
 
     // ── Verify submission exists / not already generated ──
     const verify = await fetch(
-      `${SUPABASE_URL}/rest/v1/submissions?id=eq.${submission_id}&select=id,email,audio_url,status,user_id`,
+      `${SUPABASE_URL}/rest/v1/submissions?id=eq.${submission_id}&select=id,email,audio_url,audio_script,status,user_id`,
       { headers: svc },
     );
     const rows = await verify.json();
     if (!Array.isArray(rows) || rows.length === 0) return json({ error: "Invalid submission" }, 403);
     const submission = rows[0];
-    if (submission.audio_url) return json({ audio_url: submission.audio_url, cached: true });
+    // Return cached audio only if it was produced by this exact script. Legacy
+    // rows (audio_script null) keep the old cache-on-any-audio behavior.
+    if (submission.audio_url && (submission.audio_script == null || submission.audio_script === script)) {
+      return json({ audio_url: submission.audio_url, cached: true });
+    }
 
-    // ── Gate ──
-    if (userId) {
+    // First generation = no audio yet. Editing the script and re-voicing is a
+    // regeneration: it overwrites the audio but is NOT charged again.
+    const firstGeneration = !submission.audio_url;
+
+    // ── Gate (first generation only) ──
+    if (firstGeneration && userId) {
       // Signed in: must have a credit. Pre-check now, decrement only after success (no refund needed).
       const c = await fetch(`${SUPABASE_URL}/rest/v1/user_credits?user_id=eq.${userId}&select=balance`, { headers: svc });
       const cr = await c.json();
@@ -68,7 +76,7 @@ Deno.serve(async (req) => {
         await logEvent("audio_blocked_no_credits");
         return json({ error: "out_of_credits", message: "You're out of credits.", scriptPreserved: true }, 402);
       }
-    } else {
+    } else if (firstGeneration) {
       // Anonymous: first audio per email is free; after that, sign-in is required.
       const count = await fetch(
         `${SUPABASE_URL}/rest/v1/submissions?email=eq.${encodeURIComponent(submission.email)}&audio_url=not.is.null&select=id`,
@@ -137,9 +145,9 @@ Deno.serve(async (req) => {
     }
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/manifestations/${filename}`;
 
-    // ── Success: charge a credit (signed-in only), then persist + adopt user_id ──
+    // ── Success: charge a credit (first generation, signed-in only), then persist ──
     let creditsRemaining: number | null = null;
-    if (userId) {
+    if (firstGeneration && userId) {
       const consume = await fetch(`${SUPABASE_URL}/rest/v1/rpc/consume_credit`, {
         method: "POST",
         headers: { ...svc, "Content-Type": "application/json" },
@@ -148,7 +156,12 @@ Deno.serve(async (req) => {
       creditsRemaining = consume.ok ? await consume.json() : null;
     }
 
-    const patch: Record<string, unknown> = { audio_url: publicUrl, audio_file_path: filename, status: "ready" };
+    const patch: Record<string, unknown> = {
+      audio_url: publicUrl,
+      audio_file_path: filename,
+      audio_script: script,
+      status: "ready",
+    };
     if (userId && !submission.user_id) patch.user_id = userId; // claim anonymous submission on first signed-in gen
     await fetch(`${SUPABASE_URL}/rest/v1/submissions?id=eq.${submission_id}`, {
       method: "PATCH",
