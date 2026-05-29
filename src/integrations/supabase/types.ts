@@ -137,7 +137,7 @@ export type Database = {
           audio_url: string | null
           consent_given: boolean
           created_at: string
-          email: string
+          email: string | null
           id: string
           input_type: string
           last_listened_at: string | null
@@ -160,7 +160,7 @@ export type Database = {
           audio_url?: string | null
           consent_given?: boolean
           created_at?: string
-          email: string
+          email?: string | null
           id?: string
           input_type: string
           last_listened_at?: string | null
@@ -183,7 +183,7 @@ export type Database = {
           audio_url?: string | null
           consent_given?: boolean
           created_at?: string
-          email?: string
+          email?: string | null
           id?: string
           input_type?: string
           last_listened_at?: string | null
