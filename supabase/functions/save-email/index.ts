@@ -9,9 +9,21 @@ const json = (body: unknown, status = 200) =>
 const escapeHtml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+async function hmac(email: string, secret: string): Promise<string> {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(email.toLowerCase()));
+  return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 // Build the "your ritual is ready" email. Calm, minimal, light-background
 // (email clients render dark backgrounds inconsistently).
-function ritualEmailHtml(opts: { script: string; audioUrl: string | null; appUrl: string }) {
+function ritualEmailHtml(opts: { script: string; audioUrl: string | null; appUrl: string; unsubUrl: string }) {
   const scriptLines = escapeHtml(opts.script)
     .split("\n")
     .filter((l) => l.trim().length > 0)
@@ -40,6 +52,8 @@ function ritualEmailHtml(opts: { script: string; audioUrl: string | null; appUrl
           <p style="margin:0 0 6px;font-size:14px;color:#555;">Listen every morning. Let your future settle into your body.</p>
           <p style="margin:16px 0 0;font-size:13px;color:#888;">Want to keep all your rituals and build a daily streak?
             <a href="${opts.appUrl}/login" style="color:#C8573A;">Create a free account</a>.</p>
+          <p style="margin:18px 0 0;font-size:12px;color:#aaa;">We'll send a gentle daily reminder so you don't forget.
+            <a href="${opts.unsubUrl}" style="color:#aaa;">Unsubscribe</a>.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -89,6 +103,14 @@ Deno.serve(async (req) => {
       body: JSON.stringify({ email: clean }),
     });
 
+    // Register the reminder opt-in (the save is the consent moment). Merge so a
+    // previously-unsubscribed address isn't silently re-enabled here.
+    await fetch(`${SUPABASE_URL}/rest/v1/email_preferences`, {
+      method: "POST",
+      headers: { ...svc, "Content-Type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+      body: JSON.stringify({ email: clean }),
+    });
+
     // ── Send the ritual email (best-effort) ──
     let emailSent = false;
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -96,7 +118,10 @@ Deno.serve(async (req) => {
       try {
         const from = Deno.env.get("RESEND_FROM") || "ManifestFlow <onboarding@resend.dev>";
         const appUrl = Deno.env.get("APP_URL") || "https://vista-genesis-ai.lovable.app";
+        const UNSUB_SECRET = Deno.env.get("UNSUB_SECRET") || SERVICE_KEY;
         const script = submission.audio_script || submission.polished_script || "";
+        const token = await hmac(clean, UNSUB_SECRET);
+        const unsubUrl = `${SUPABASE_URL}/functions/v1/unsubscribe?email=${encodeURIComponent(clean)}&token=${token}`;
         const res = await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
@@ -104,7 +129,7 @@ Deno.serve(async (req) => {
             from,
             to: clean,
             subject: "Your ritual is ready",
-            html: ritualEmailHtml({ script, audioUrl: submission.audio_url, appUrl }),
+            html: ritualEmailHtml({ script, audioUrl: submission.audio_url, appUrl, unsubUrl }),
           }),
         });
         emailSent = res.ok;
